@@ -1,0 +1,7 @@
+language: java
+dist: bionic
+os: linux
+
+branches:
+  only:
+    - /.*/
