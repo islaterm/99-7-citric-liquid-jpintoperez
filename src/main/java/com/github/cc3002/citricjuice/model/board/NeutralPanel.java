@@ -8,7 +8,7 @@ public class NeutralPanel extends AbstractPanel {
      *   Creates an instance of NeutralPanel.
      */
 
-    public NeutralPanel() { super(PanelType.NEUTRAL); }
+    public NeutralPanel(int panelID) { super(panelID); }
 
     @Override
     public void activatedBy(Player player) {

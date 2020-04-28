@@ -4,17 +4,12 @@ import com.github.cc3002.citricjuice.model.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 abstract class AbstractPanel implements IPanel {
-    private final PanelType type;
     private final Set<IPanel> nextPanels = new HashSet<>();
-
-    /**
-     * Should return the according PanelType and might vary between
-     * each subclass.
-     */
-    public PanelType getType() { return type; }
+    private final int panelID;
 
     /**
      * Returns a copy of this panel's next ones.
@@ -24,24 +19,26 @@ abstract class AbstractPanel implements IPanel {
     }
 
     /**
-     * Adds a new adjacent panel to this one.
+     * Adds a new adjacent panel to this one if they have a different ID.
      *
      * @param panel
      *     the panel to be added.
      */
     public void addNextPanel(final IPanel panel) {
-        nextPanels.add(panel);
+        if (!this.equals(panel)) {
+            nextPanels.add(panel);
+        }
     }
 
 
     /**
      * Creates a new panel
      *
-     * @param type
-     *      the type of the panel
+     * @param panelID
+     *      the unique integer identifier of this panel
      */
-    protected AbstractPanel(final PanelType type) {
-        this.type = type;
+    public AbstractPanel(int panelID) {
+        this.panelID = panelID;
     }
 
     /**
@@ -71,6 +68,27 @@ abstract class AbstractPanel implements IPanel {
      */
     public abstract void activatedBy(final Player player);
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPanelID(), getNextPanels(), getClass());
+    }
 
+    @Override
+    public int getPanelID() {
+        return this.panelID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AbstractPanel)) {
+            return false;
+        }
+        final AbstractPanel otherPanel = (AbstractPanel) o;
+        return this.getPanelID() == otherPanel.getPanelID();
+
+    }
 
 }

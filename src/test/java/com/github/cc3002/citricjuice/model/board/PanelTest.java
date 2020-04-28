@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author <a href="mailto:ignacio.slater@ug.uchile.cl">Ignacio Slater M.</a>.
@@ -33,31 +32,37 @@ class PanelTest {
 
   @BeforeEach
   public void setUp() {
-    testBonusPanel = new BonusPanel();
-    testBossPanel = new BossPanel();
-    testDropPanel = new DropPanel();
-    testEncounterPanel = new EncounterPanel();
-    testHomePanel = new HomePanel();
-    testNeutralPanel = new NeutralPanel();
+    testBonusPanel = new BonusPanel(0);
+    testBossPanel = new BossPanel(1);
+    testDropPanel = new DropPanel(2);
+    testEncounterPanel = new EncounterPanel(3);
+    testHomePanel = new HomePanel(4);
+    testNeutralPanel = new NeutralPanel(5);
     testSeed = new Random().nextLong();
     suguri = new Player(PLAYER_NAME, BASE_HP, BASE_ATK, BASE_DEF, BASE_EVD);
   }
 
   @Test
   public void constructorTest() {
-    assertEquals(PanelType.BONUS, testBonusPanel.getType());
-    assertEquals(PanelType.BOSS, testBossPanel.getType());
-    assertEquals(PanelType.DROP, testDropPanel.getType());
-    assertEquals(PanelType.ENCOUNTER, testEncounterPanel.getType());
-    assertEquals(PanelType.HOME, testHomePanel.getType());
-    assertEquals(PanelType.NEUTRAL, testNeutralPanel.getType());
+
+    BonusPanel sameIDBonusPanel = new BonusPanel(0);
+
+    assertNotEquals(testBonusPanel, testDropPanel);
+    assertEquals(sameIDBonusPanel, testBonusPanel);
+    assertEquals(new BossPanel(1), testBossPanel);
+    assertEquals(new DropPanel(2), testDropPanel);
+    assertEquals(new EncounterPanel(3), testEncounterPanel);
+    assertEquals(new HomePanel(4), testHomePanel);
+    assertEquals(new NeutralPanel(5), testNeutralPanel);
   }
 
   @Test
   public void nextPanelTest() {
     assertTrue(testNeutralPanel.getNextPanels().isEmpty());
-    final var expectedPanel1 = new NeutralPanel();
-    final var expectedPanel2 = new NeutralPanel();
+    final var expectedPanel1 = new NeutralPanel(6);
+    final var expectedPanel2 = new NeutralPanel(7);
+    final var sameIDPanel = new NeutralPanel(5);
+    final var sameIDasAddedPanel = new BonusPanel(6);
 
     testNeutralPanel.addNextPanel(expectedPanel1);
     assertEquals(1, testNeutralPanel.getNextPanels().size());
@@ -68,16 +73,28 @@ class PanelTest {
     testNeutralPanel.addNextPanel(expectedPanel2);
     assertEquals(2, testNeutralPanel.getNextPanels().size());
 
+    // Shouldn't add if it has the same ID or is the same object.
+    testNeutralPanel.addNextPanel(sameIDPanel);
+    testNeutralPanel.addNextPanel(testNeutralPanel);
+    assertEquals(2, testNeutralPanel.getNextPanels().size());
+
+    // Shouldn't add because there's already a ID: 6 panel
+    testNeutralPanel.addNextPanel(expectedPanel2);
+    assertEquals(2, testNeutralPanel.getNextPanels().size());
+
     assertEquals(Set.of(expectedPanel1, expectedPanel2),
                  testNeutralPanel.getNextPanels());
   }
 
   @Test
   public void homePanelTest() {
+    // this test verifies that the player cannot exceed maximum HP through healing
+    // with the Home panel.
     assertEquals(suguri.getMaxHP(), suguri.getCurrentHP());
     testHomePanel.activatedBy(suguri);
     assertEquals(suguri.getMaxHP(), suguri.getCurrentHP());
 
+    // this one verifies that the play can effectively heal using the home panel.
     suguri.setCurrentHP(1);
     testHomePanel.activatedBy(suguri);
     assertEquals(2, suguri.getCurrentHP());
@@ -85,6 +102,8 @@ class PanelTest {
 
   @Test
   public void neutralPanelTest() {
+
+    // this one verifies that the neutralPanel doesn't affect the player
     final var expectedSuguri = suguri.copy();
     testNeutralPanel.activatedBy(suguri);
     assertEquals(expectedSuguri, suguri);

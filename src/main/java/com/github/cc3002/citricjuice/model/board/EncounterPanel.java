@@ -8,7 +8,8 @@ public class EncounterPanel extends AbstractPanel {
      *   Creates an instance of EncounterPanel.
      */
 
-    public EncounterPanel() { super(PanelType.ENCOUNTER); }
+    public EncounterPanel(int panelID) {
+        super(panelID); }
 
     @Override
     public void activatedBy(Player player) {
