@@ -6,13 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 public interface IPanel {
-
-    /**
-     * Should return the according PanelType and might vary between
-     * each subclass.
-     */
-    PanelType getType();
-
     /**
      * Should return a copy of the panels that are next to it.
      */
@@ -31,6 +24,11 @@ public interface IPanel {
      *      the player that activates this panel.
      */
     void activatedBy(final Player player);
+
+    /**
+     * Should return this panel's ID
+     */
+    int getPanelID();
 
 
 

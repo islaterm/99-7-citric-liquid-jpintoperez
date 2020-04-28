@@ -18,10 +18,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PlayerTest {
   private final static String PLAYER_NAME = "Suguri";
   private Player suguri;
+  private Player kai;
 
   @BeforeEach
   public void setUp() {
     suguri = new Player(PLAYER_NAME, 4, 1, -1, 2);
+    kai = new Player("Kai", 5, 1, 0, 0);
+
   }
 
   @Test
@@ -37,6 +40,9 @@ public class PlayerTest {
     assertEquals(suguri, suguri);
     final var expectedSuguri = new Player(PLAYER_NAME, 4, 1, -1, 2);
     assertEquals(expectedSuguri, suguri);
+    // also check if suguri is not equal to a different character (kai)
+    assertNotEquals(suguri,kai);
+
   }
 
   @Test

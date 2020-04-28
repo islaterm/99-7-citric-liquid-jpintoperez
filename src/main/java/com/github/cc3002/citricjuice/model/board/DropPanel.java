@@ -8,8 +8,8 @@ public class DropPanel extends AbstractPanel {
      *   Creates an instance of DropPanel.
      */
 
-    public DropPanel() {
-        super(PanelType.DROP);
+    public DropPanel(int panelID) {
+        super(panelID);
     }
 
     @Override

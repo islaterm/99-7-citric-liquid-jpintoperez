@@ -8,7 +8,7 @@ public class BossPanel extends AbstractPanel {
      *   Creates an instance of BossPanel.
      */
 
-    public BossPanel() { super(PanelType.BOSS); }
+    public BossPanel(int panelID) { super(panelID); }
 
     @Override
     public void activatedBy(Player player) {
