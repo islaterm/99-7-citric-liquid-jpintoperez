@@ -62,6 +62,7 @@ class PanelTest {
     final var expectedPanel1 = new NeutralPanel(6);
     final var expectedPanel2 = new NeutralPanel(7);
     final var sameIDPanel = new NeutralPanel(5);
+    final var sameIDasAddedPanel = new BonusPanel(6);
 
     testNeutralPanel.addNextPanel(expectedPanel1);
     assertEquals(1, testNeutralPanel.getNextPanels().size());
@@ -75,6 +76,10 @@ class PanelTest {
     // Shouldn't add if it has the same ID or is the same object.
     testNeutralPanel.addNextPanel(sameIDPanel);
     testNeutralPanel.addNextPanel(testNeutralPanel);
+    assertEquals(2, testNeutralPanel.getNextPanels().size());
+
+    // Shouldn't add because there's already a ID: 6 panel
+    testNeutralPanel.addNextPanel(expectedPanel2);
     assertEquals(2, testNeutralPanel.getNextPanels().size());
 
     assertEquals(Set.of(expectedPanel1, expectedPanel2),

@@ -4,6 +4,7 @@ import com.github.cc3002.citricjuice.model.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 abstract class AbstractPanel implements IPanel {
@@ -66,6 +67,11 @@ abstract class AbstractPanel implements IPanel {
      * Executes the appropriate action to the player according to the panel's type.
      */
     public abstract void activatedBy(final Player player);
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPanelID(), getNextPanels(), getClass());
+    }
 
     @Override
     public int getPanelID() {
