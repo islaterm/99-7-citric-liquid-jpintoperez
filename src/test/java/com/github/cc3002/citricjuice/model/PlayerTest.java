@@ -19,12 +19,15 @@ public class PlayerTest {
   private final static String PLAYER_NAME = "Suguri";
   private Player suguri;
   private Player kai;
+  private WildUnit chicken;
+  private BossUnit manager;
 
   @BeforeEach
   public void setUp() {
     suguri = new Player(PLAYER_NAME, 4, 1, -1, 2);
     kai = new Player("Kai", 5, 1, 0, 0);
-
+    chicken = new WildUnit("Chicken", 3, -1, -1, 1);
+    manager = new BossUnit("Store Manager", 8, 3, 2, -1);
   }
 
   @Test
@@ -110,4 +113,135 @@ public class PlayerTest {
                + "Test failed with random seed: " + testSeed);
   }
   // endregion
+
+  @RepeatedTest(500)
+  public void winsAndStarsConsistencyTest() {
+    final long testSeed1 = new Random().nextLong();
+    final long testSeed2 = new Random().nextLong();
+    final long testSeed3 = new Random().nextLong();
+    final long testSeed4 = new Random().nextLong();
+    Random suguriRandom = new Random();
+    Random kaiRandom = new Random();
+    Random chickenRandom = new Random();
+    Random managerRandom = new Random();
+    suguriRandom.setSeed(testSeed1);
+    kaiRandom.setSeed(testSeed2);
+    chickenRandom.setSeed(testSeed3);
+    managerRandom.setSeed(testSeed4);
+    suguri.setSeed(testSeed1);
+    kai.setSeed(testSeed2);
+    chicken.setSeed(testSeed3);
+    manager.setSeed(testSeed4);
+
+    kai.setCurrentHP(3);
+    kai.increaseStarsBy(30);
+
+    int kaiDefense = kaiRandom.nextInt(6) + 1 + kai.getDef();
+    int managerAttack = managerRandom.nextInt(6) + 1 + manager.getAtk();
+    int expectedAttack = Math.max(1, managerAttack - kaiDefense);
+    int expectedBossStars = 0;
+    int expectedBossWins = 0;
+    if (expectedAttack >= kai.getCurrentHP()) {
+      expectedBossStars = Math.floorDiv(kai.getStars(),2);
+      expectedBossWins = 2; }
+    kai.defendAttack(manager, manager.getAttackRoll());
+
+    assertEquals(manager.getStars(), expectedBossStars);
+    assertEquals(manager.getWins(), expectedBossWins);
+
+    manager.setCurrentHP(2);
+    int suguriAttack = suguriRandom.nextInt(6) + 1 + suguri.getAtk();
+    int managerEvasion = managerRandom.nextInt(6) + 1 + manager.getEvd();
+    int expectedManagerHP = Math.max(0, manager.getCurrentHP() - suguriAttack );
+    int expectedSuguriStars = 0;
+    int expectedSuguriWins = 0;
+    if (managerEvasion > suguriAttack) {
+      expectedManagerHP = manager.getCurrentHP();
+    }
+    if (expectedManagerHP == 0) {
+      expectedSuguriStars = manager.getStars();
+      expectedSuguriWins = 3;
+    }
+    manager.evadeAttack(suguri, suguri.getAttackRoll());
+
+    assertEquals(expectedSuguriStars,suguri.getStars());
+    assertEquals(expectedSuguriWins,suguri.getWins());
+
+    chicken.increaseStarsBy(13);
+    chicken.setCurrentHP(2);
+    int chickenDefense = chickenRandom.nextInt(6) + 1 + chicken.getDef();
+    int kaiAttack = kaiRandom.nextInt(6) + 1 + kai.getAtk();
+    int expectedChickenHP = Math.max(0, chicken.getCurrentHP() - Math.max(1 , kaiAttack - chickenDefense ));
+    int expectedKaiStars = kai.getStars();
+    int expectedKaiWins = kai.getWins();
+    if (expectedChickenHP == 0) {
+      expectedKaiStars += 13;
+      expectedKaiWins += 1;
+    }
+    chicken.evadeAttack(kai, kai.getAttackRoll());
+
+    assertEquals(expectedKaiStars,kai.getStars());
+    assertEquals(expectedKaiWins,kai.getWins());
+
+
+
+
+
+
+
+  }
+
+  @RepeatedTest(100)
+  public void defendFromAttackConsistencyTest() {
+    final long testSeed1 = new Random().nextLong();
+    final long testSeed2 = new Random().nextLong();
+    final Random suguriRandom = new Random();
+    final Random kaiRandom = new Random();
+    suguriRandom.setSeed(testSeed1);
+    suguri.setSeed(testSeed1);
+    kaiRandom.setSeed(testSeed2);
+    kai.setSeed(testSeed2);
+
+    int expectedAttack = suguriRandom.nextInt(6) + 1 + suguri.getAtk();
+    int expectedDefense = kaiRandom.nextInt(6) + 1 + kai.getDef();
+
+    int expectedKaiHP = Math.max(0,kai.getCurrentHP() - Math.max(1, expectedAttack - expectedDefense));
+    kai.defendAttack(suguri, suguri.getAttackRoll() );
+    assertEquals(kai.getCurrentHP(),expectedKaiHP);
+
+  }
+
+  @RepeatedTest(100)
+  public void evadeAttackConsistencyTest() {
+    final long testSeed1 = new Random().nextLong();
+    final long testSeed2 = new Random().nextLong();
+    final Random suguriRandom = new Random();
+    final Random kaiRandom = new Random();
+    suguriRandom.setSeed(testSeed1);
+    suguri.setSeed(testSeed1);
+    kaiRandom.setSeed(testSeed2);
+    kai.setSeed(testSeed2);
+
+    int expectedAttack = suguriRandom.nextInt(6) + 1 + suguri.getAtk();
+    int expectedEvade = kaiRandom.nextInt(6) + 1 + kai.getEvd();
+
+    int expectedKaiHP = Math.max(0,kai.getCurrentHP() - expectedAttack);
+    if (expectedEvade > expectedAttack) {
+      expectedKaiHP = kai.getCurrentHP(); }
+
+    kai.evadeAttack(suguri, suguri.getAttackRoll() );
+    assertEquals(kai.getCurrentHP(),expectedKaiHP);
+
+  }
+
+  @Test
+  public void statChangingTest() {
+    suguri.setAtk(5);
+    assertEquals(suguri.getAtk(),5);
+    suguri.setDef(2);
+    assertEquals(suguri.getAtk(),2);
+    suguri.setEvd(-3);
+
+  }
+
 }

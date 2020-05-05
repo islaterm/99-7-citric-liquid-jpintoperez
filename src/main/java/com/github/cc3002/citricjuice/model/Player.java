@@ -10,16 +10,7 @@ import java.util.Random;
  * @version 1.0.6-rc.3
  * @since 1.0
  */
-public class Player {
-  private final Random random;
-  private final String name;
-  private final int maxHP;
-  private final int atk;
-  private final int def;
-  private final int evd;
-  private int normaLevel;
-  private int stars;
-  private int currentHP;
+public class Player extends AbstractUnit {
 
   /**
    * Creates a new character.
@@ -37,80 +28,10 @@ public class Player {
    */
   public Player(final String name, final int hp, final int atk, final int def,
                 final int evd) {
-    this.name = name;
-    this.maxHP = currentHP = hp;
-    this.atk = atk;
-    this.def = def;
-    this.evd = evd;
+    super(name, hp, atk, def, evd);
     normaLevel = 1;
-    random = new Random();
   }
 
-  /**
-   * Increases this player's star count by an amount.
-   */
-  public void increaseStarsBy(final int amount) {
-    stars += amount;
-  }
-
-  /**
-   * Returns this player's star count.
-   */
-  public int getStars() {
-    return stars;
-  }
-
-  /**
-   * Set's the seed for this player's random number generator.
-   * <p>
-   * The random number generator is used for taking non-deterministic decisions, this method is
-   * declared to avoid non-deterministic behaviour while testing the code.
-   */
-  public void setSeed(final long seed) {
-    random.setSeed(seed);
-  }
-
-  /**
-   * Returns a uniformly distributed random value in [1, 6]
-   */
-  public int roll() {
-    return random.nextInt(6) + 1;
-  }
-
-  /**
-   * Returns the character's name.
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Returns the character's max hit points.
-   */
-  public int getMaxHP() {
-    return maxHP;
-  }
-
-  /**
-   * Returns the current character's attack points.
-   */
-  public int getAtk() {
-    return atk;
-  }
-
-  /**
-   * Returns the current character's defense points.
-   */
-  public int getDef() {
-    return def;
-  }
-
-  /**
-   * Returns the current character's evasion points.
-   */
-  public int getEvd() {
-    return evd;
-  }
 
   /**
    * Returns the current norma level
@@ -124,31 +45,6 @@ public class Player {
    */
   public void normaClear() {
     normaLevel++;
-  }
-
-  /**
-   * Returns the current hit points of the character.
-   */
-  public int getCurrentHP() {
-    return currentHP;
-  }
-
-  /**
-   * Sets the current character's hit points.
-   * <p>
-   * The character's hit points have a constraint to always be between 0 and maxHP, both inclusive.
-   */
-  public void setCurrentHP(final int newHP) {
-    this.currentHP = Math.max(Math.min(newHP, maxHP), 0);
-  }
-
-  /**
-   * Reduces this player's star count by a given amount.
-   * <p>
-   * The star count will must always be greater or equal to 0
-   */
-  public void reduceStarsBy(final int amount) {
-    stars = Math.max(0, stars - amount);
   }
 
   @Override
@@ -171,9 +67,63 @@ public class Player {
   }
 
   /**
+   * Changes the value of this player's atk.
+   * @param value to replace atk with
+   */
+  public void setAtk(int value) {
+    this.atk = value;
+  }
+
+  /**
+   * Changes the value of this player's def.
+   * @param value to replace def with
+   */
+  public void setDef(int value) {
+    this.def = value;
+  }
+  /**
+   * Changes the value of this player's evd.
+   * @param value to replace evd with
+   */
+  public void setEvd(int value) {
+    this.evd = value;
+  }
+
+
+  /**
    * Returns a copy of this character.
    */
   public Player copy() {
     return new Player(name, maxHP, atk, def, evd);
+  }
+
+
+  @Override
+  void defeatedBy(AbstractUnit attacker) {
+    attacker.winAgainstPlayer(this);
+  }
+
+  @Override
+  void winAgainstPlayer(Player player) {
+    this.increaseWinsBy(2);
+    int getStars = Math.floorDiv(player.getStars(),2);
+    this.increaseStarsBy(getStars);
+    player.reduceStarsBy(getStars);
+  }
+
+  @Override
+  void winAgainstWildUnit(WildUnit wildunit) {
+    this.increaseWinsBy(1);
+    int getStars = wildunit.getStars();
+    this.increaseStarsBy(getStars);
+    wildunit.reduceStarsBy(getStars);
+  }
+
+  @Override
+  void winAgainstBossUnit(BossUnit bossunit) {
+    this.increaseWinsBy(3);
+    int getStars = bossunit.getStars();
+    this.increaseStarsBy(getStars);
+    bossunit.reduceStarsBy(getStars);
   }
 }
