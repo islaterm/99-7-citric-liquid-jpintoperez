@@ -2,10 +2,25 @@ package com.github.cc3002.citricjuice.model;
 
 public class WildUnit extends AbstractUnit {
 
+    /**
+     * Creates a new wild unit.
+     *
+     * @param name
+     *     the character's name.
+     * @param hp
+     *     the initial (and max) hit points of the character.
+     * @param atk
+     *     the base damage the character does.
+     * @param def
+     *     the base defense of the character.
+     * @param evd
+     *     the base evasion of the character.
+     */
     public WildUnit(final String name, final int hp, final int atk, final int def,
                     final int evd) {
         super(name, hp, atk, def, evd);
     }
+
 
     @Override
     public boolean equals(final Object o) {

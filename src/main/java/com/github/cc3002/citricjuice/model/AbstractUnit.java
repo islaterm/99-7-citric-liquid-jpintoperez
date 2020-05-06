@@ -23,7 +23,7 @@ public abstract class AbstractUnit implements IUnit {
   protected int wins;
 
   /**
-   * Creates a new character.
+   * Creates a new unit.
    *
    * @param name
    *     the character's name.
@@ -157,27 +157,6 @@ public abstract class AbstractUnit implements IUnit {
     stars = Math.max(0, stars - amount);
   }
 
-  /*
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof AbstractUnit)) {
-      return false;
-    }
-    final AbstractUnit player = (AbstractUnit) o;
-    return getMaxHP() == player.getMaxHP() &&
-           getAtk() == player.getAtk() &&
-           getDef() == player.getDef() &&
-           getEvd() == player.getEvd() &&
-           getNormaLevel() == player.getNormaLevel() &&
-           getStars() == player.getStars() &&
-           getCurrentHP() == player.getCurrentHP() &&
-           getName().equals(player.getName());
-  }
-  */
-
 
   /**
    * Returns a copy of this unit.
@@ -192,6 +171,7 @@ public abstract class AbstractUnit implements IUnit {
   public boolean isKOd() {
     return (this.getCurrentHP() == 0);
   }
+
   /**
    * Performs an attack roll and returns the value of the roll + the
    * unit's current attack.
@@ -274,9 +254,29 @@ public abstract class AbstractUnit implements IUnit {
     }
   }
 
+  /***
+   * Performs the respective action of telling the attacker that it has defeated this unit.
+   * @param attacker the enemy unit that defeated this one.
+   */
   abstract void defeatedBy(AbstractUnit attacker);
+
+  /***
+   * Should take a certain portion of the player's stars and get victories. It may vary between each subclass.
+   * @param player the enemy player that this unit has just defeated.
+   */
   abstract void winAgainstPlayer(Player player);
+
+  /***
+   * Should take a certain portion of the wild unit's stars and get victories. It may vary in amounts between each
+   * subclass.
+   * @param wildunit the enemy wild unit that this unit has just defeated.
+   */
   abstract void winAgainstWildUnit(WildUnit wildunit);
+  /***
+   * Should take a certain portion of the boss unit's stars and get victories. It may vary in amounts between each
+   * subclass.
+   * @param bossunit the enemy boss unit that this unit has just defeated.
+   */
   abstract void winAgainstBossUnit(BossUnit bossunit);
 
 

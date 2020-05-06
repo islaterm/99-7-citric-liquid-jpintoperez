@@ -2,6 +2,20 @@ package com.github.cc3002.citricjuice.model;
 
 public class BossUnit extends AbstractUnit {
 
+    /**
+     * Creates a new boss unit.
+     *
+     * @param name
+     *     the character's name.
+     * @param hp
+     *     the initial (and max) hit points of the character.
+     * @param atk
+     *     the base damage the character does.
+     * @param def
+     *     the base defense of the character.
+     * @param evd
+     *     the base evasion of the character.
+     */
     public BossUnit(final String name, final int hp, final int atk, final int def,
                     final int evd) {
         super(name, hp, atk, def, evd);

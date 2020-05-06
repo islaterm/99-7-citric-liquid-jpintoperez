@@ -47,6 +47,11 @@ public class Player extends AbstractUnit {
     normaLevel++;
   }
 
+  /***
+   * Checks whether this player unit is equivalent to another object.
+   * @param o Object to compare
+   * @return {boolean} True if this unit is equivalent to o.
+   */
   @Override
   public boolean equals(final Object o) {
     if (this == o) {
@@ -96,6 +101,7 @@ public class Player extends AbstractUnit {
   public Player copy() {
     return new Player(name, maxHP, atk, def, evd);
   }
+
 
 
   @Override
