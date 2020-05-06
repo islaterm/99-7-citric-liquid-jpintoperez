@@ -239,7 +239,7 @@ public class PlayerTest {
     suguri.setAtk(5);
     assertEquals(suguri.getAtk(),5);
     suguri.setDef(2);
-    assertEquals(suguri.getAtk(),2);
+    assertEquals(suguri.getDef(),2);
     suguri.setEvd(-3);
 
   }
