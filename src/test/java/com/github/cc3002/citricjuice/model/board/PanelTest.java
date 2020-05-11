@@ -54,6 +54,9 @@ class PanelTest {
     assertEquals(new EncounterPanel(3), testEncounterPanel);
     assertEquals(new HomePanel(4), testHomePanel);
     assertEquals(new NeutralPanel(5), testNeutralPanel);
+
+    assertNotEquals(testBonusPanel, new Object());
+    assertNotEquals(testNeutralPanel, new Player("Peat", 3, 1, 1, 1));
   }
 
   @Test
@@ -106,6 +109,18 @@ class PanelTest {
     // this one verifies that the neutralPanel doesn't affect the player
     final var expectedSuguri = suguri.copy();
     testNeutralPanel.activatedBy(suguri);
+    assertEquals(expectedSuguri, suguri);
+
+  }
+
+  @Test
+  public void unimplementedPanelTests() {
+
+    // this one verifies that the unimplemented panels also do not affect the player
+    final var expectedSuguri = suguri.copy();
+    testBossPanel.activatedBy(suguri);
+    assertEquals(expectedSuguri, suguri);
+    testEncounterPanel.activatedBy(suguri);
     assertEquals(expectedSuguri, suguri);
   }
 

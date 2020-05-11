@@ -126,13 +126,6 @@ public abstract class AbstractUnit implements IUnit {
   }
 
   /**
-   * Performs a norma clear action; the {@code norma} counter increases in 1.
-   */
-  public void normaClear() {
-    normaLevel++;
-  }
-
-  /**
    * Returns the current hit points of the character.
    */
   public int getCurrentHP() {
@@ -222,7 +215,9 @@ public abstract class AbstractUnit implements IUnit {
     int value = getDefenseRoll();
 
     total = Math.max(1, incomingDamage - (value));
-
+    if (incomingDamage == 0) {
+      total = 0;
+    }
     int previousHP = this.getCurrentHP();
     this.setCurrentHP( previousHP - total );
 
