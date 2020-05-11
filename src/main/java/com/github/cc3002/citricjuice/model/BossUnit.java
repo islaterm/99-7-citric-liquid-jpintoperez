@@ -67,7 +67,7 @@ public class BossUnit extends AbstractUnit {
 
     @Override
     void winAgainstBossUnit(BossUnit bossunit) {
-        this.increaseStarsBy(3);
+        this.increaseWinsBy(3);
         int getStars = Math.floorDiv(bossunit.getStars(),2);
         this.increaseStarsBy(getStars);
         bossunit.reduceStarsBy(getStars);

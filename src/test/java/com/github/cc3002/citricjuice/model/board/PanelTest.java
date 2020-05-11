@@ -21,12 +21,12 @@ class PanelTest {
   private final static int BASE_ATK = 1;
   private final static int BASE_DEF = -1;
   private final static int BASE_EVD = 2;
-  private IPanel testHomePanel;
-  private IPanel testNeutralPanel;
-  private IPanel testBonusPanel;
-  private IPanel testDropPanel;
-  private IPanel testEncounterPanel;
-  private IPanel testBossPanel;
+  private HomePanel testHomePanel;
+  private NeutralPanel testNeutralPanel;
+  private BonusPanel testBonusPanel;
+  private DropPanel testDropPanel;
+  private EncounterPanel testEncounterPanel;
+  private BossPanel testBossPanel;
   private Player suguri;
   private long testSeed;
 
@@ -54,6 +54,9 @@ class PanelTest {
     assertEquals(new EncounterPanel(3), testEncounterPanel);
     assertEquals(new HomePanel(4), testHomePanel);
     assertEquals(new NeutralPanel(5), testNeutralPanel);
+
+    assertNotEquals(testBonusPanel, new Object());
+    assertNotEquals(testNeutralPanel, new Player("Peat", 3, 1, 1, 1));
   }
 
   @Test
@@ -79,7 +82,7 @@ class PanelTest {
     assertEquals(2, testNeutralPanel.getNextPanels().size());
 
     // Shouldn't add because there's already a ID: 6 panel
-    testNeutralPanel.addNextPanel(expectedPanel2);
+    testNeutralPanel.addNextPanel(sameIDasAddedPanel);
     assertEquals(2, testNeutralPanel.getNextPanels().size());
 
     assertEquals(Set.of(expectedPanel1, expectedPanel2),
@@ -106,6 +109,18 @@ class PanelTest {
     // this one verifies that the neutralPanel doesn't affect the player
     final var expectedSuguri = suguri.copy();
     testNeutralPanel.activatedBy(suguri);
+    assertEquals(expectedSuguri, suguri);
+
+  }
+
+  @Test
+  public void unimplementedPanelTests() {
+
+    // this one verifies that the unimplemented panels also do not affect the player
+    final var expectedSuguri = suguri.copy();
+    testBossPanel.activatedBy(suguri);
+    assertEquals(expectedSuguri, suguri);
+    testEncounterPanel.activatedBy(suguri);
     assertEquals(expectedSuguri, suguri);
   }
 

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version 1.0.6-rc.1
  * @since 1.0
  */
-public class PlayerTest {
+public class UnitTest {
   private final static String PLAYER_NAME = "Suguri";
   private Player suguri;
   private Player kai;
@@ -34,6 +34,12 @@ public class PlayerTest {
   public void constructorTest() {
     final var expectedSuguri = new Player(PLAYER_NAME, 4, 1, -1, 2);
     assertEquals(expectedSuguri, suguri);
+
+    final var expectedChicken = new WildUnit("Chicken", 3, -1, -1, 1);
+    assertEquals(expectedChicken, chicken);
+
+    final var expectedManager = new BossUnit("Store Manager", 8, 3, 2, -1);
+    assertEquals(expectedManager, manager);
   }
 
   @Test
@@ -45,6 +51,13 @@ public class PlayerTest {
     assertEquals(expectedSuguri, suguri);
     // also check if suguri is not equal to a different character (kai)
     assertNotEquals(suguri,kai);
+
+    assertNotEquals(manager, o);
+    assertEquals(manager, manager);
+
+    assertNotEquals(chicken, o);
+    assertNotEquals(chicken, manager);
+    assertEquals(chicken, chicken);
 
   }
 
@@ -69,10 +82,19 @@ public class PlayerTest {
   public void copyTest() {
     final var expectedSuguri = new Player(PLAYER_NAME, 4, 1, -1, 2);
     final var actualSuguri = suguri.copy();
+    final var expectedManager = manager;
+    final var actualManager = manager.copy();
+    final var expectedChicken = chicken;
+    final var actualChicken = chicken.copy();
     // Checks that the copied player have the same parameters as the original
     assertEquals(expectedSuguri, actualSuguri);
+    assertEquals(expectedManager, actualManager);
+    assertEquals(expectedChicken, actualChicken);
     // Checks that the copied player doesn't reference the same object
     assertNotSame(expectedSuguri, actualSuguri);
+    assertNotSame(expectedManager, actualManager);
+    assertNotSame(expectedChicken, actualChicken);
+
   }
 
   // region : consistency tests
@@ -189,6 +211,77 @@ public class PlayerTest {
 
 
 
+  }
+
+  @Test
+  public void bossWinsTest() {
+    BossUnit shifurobot = new BossUnit("Shifu Robot", 7, 2, 3, -2);
+
+    kai.increaseStarsBy(50);
+    chicken.increaseStarsBy(50);
+    shifurobot.increaseStarsBy(50);
+
+    kai.setCurrentHP(1);
+    shifurobot.setCurrentHP(1);
+    chicken.setCurrentHP(1);
+
+    chicken.defendAttack(manager, manager.getAttackRoll());
+    assertEquals(manager.getStars(), 25);
+    assertEquals(manager.getWins(), 1);
+
+    kai.defendAttack(manager, manager.getAttackRoll());
+    assertEquals(manager.getStars(), 50);
+    assertEquals(manager.getWins(), 3);
+
+    shifurobot.defendAttack(manager, manager.getAttackRoll());
+    assertEquals(manager.getStars(),75);
+    assertEquals(manager.getWins(), 6);
+  }
+
+  @RepeatedTest(300)
+  public void wildWinsTest() {
+    WildUnit roboball = new WildUnit("Robo Ball", 3, -1, 1, -1);
+    final long testSeed = new Random().nextLong();
+    Random chickenRandom = new Random();
+    chickenRandom.setSeed(testSeed);
+    chicken.setSeed(testSeed);
+
+    kai.increaseStarsBy(50);
+    roboball.increaseStarsBy(50);
+    manager.increaseStarsBy(50);
+
+    kai.setCurrentHP(1);
+    manager.setCurrentHP(1);
+    roboball.setCurrentHP(1);
+
+    int expectedChickenWins = 0;
+    int expectedChickenStars = 0;
+    int expectedChickenATK =  chicken.getAtk() + chickenRandom.nextInt(6) + 1;
+    if (expectedChickenATK > 0) {
+      expectedChickenWins += 1;
+      expectedChickenStars += 25;
+    }
+    roboball.defendAttack(chicken, chicken.getAttackRoll());
+    assertEquals(expectedChickenStars, chicken.getStars());
+    assertEquals(expectedChickenWins, chicken.getWins());
+
+    expectedChickenATK =  chicken.getAtk() + chickenRandom.nextInt(6) + 1;
+    if (expectedChickenATK > 0) {
+      expectedChickenWins += 2;
+      expectedChickenStars += 25;
+    }
+    kai.defendAttack(chicken, chicken.getAttackRoll());
+    assertEquals(expectedChickenStars, chicken.getStars());
+    assertEquals(expectedChickenWins, chicken.getWins());
+
+    expectedChickenATK =  chicken.getAtk() + chickenRandom.nextInt(6) + 1;
+    if (expectedChickenATK > 0) {
+      expectedChickenWins += 3;
+      expectedChickenStars += 25;
+    }
+    manager.defendAttack(chicken, chicken.getAttackRoll());
+    assertEquals(expectedChickenStars, chicken.getStars());
+    assertEquals(expectedChickenWins, chicken.getWins());
   }
 
   @RepeatedTest(100)
