@@ -21,12 +21,12 @@ class PanelTest {
   private final static int BASE_ATK = 1;
   private final static int BASE_DEF = -1;
   private final static int BASE_EVD = 2;
-  private IPanel testHomePanel;
-  private IPanel testNeutralPanel;
-  private IPanel testBonusPanel;
-  private IPanel testDropPanel;
-  private IPanel testEncounterPanel;
-  private IPanel testBossPanel;
+  private HomePanel testHomePanel;
+  private NeutralPanel testNeutralPanel;
+  private BonusPanel testBonusPanel;
+  private DropPanel testDropPanel;
+  private EncounterPanel testEncounterPanel;
+  private BossPanel testBossPanel;
   private Player suguri;
   private long testSeed;
 
@@ -82,7 +82,7 @@ class PanelTest {
     assertEquals(2, testNeutralPanel.getNextPanels().size());
 
     // Shouldn't add because there's already a ID: 6 panel
-    testNeutralPanel.addNextPanel(expectedPanel2);
+    testNeutralPanel.addNextPanel(sameIDasAddedPanel);
     assertEquals(2, testNeutralPanel.getNextPanels().size());
 
     assertEquals(Set.of(expectedPanel1, expectedPanel2),

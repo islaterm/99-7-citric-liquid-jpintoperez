@@ -8,13 +8,13 @@ import java.util.Objects;
 import java.util.Set;
 
 abstract class AbstractPanel implements IPanel {
-    private final Set<IPanel> nextPanels = new HashSet<>();
+    private final Set<AbstractPanel> nextPanels = new HashSet<>();
     private final int panelID;
 
     /**
      * Returns a copy of this panel's next ones.
      */
-    public Set<IPanel> getNextPanels() {
+    public Set<AbstractPanel> getNextPanels() {
         return Set.copyOf(nextPanels);
     }
 
@@ -24,12 +24,25 @@ abstract class AbstractPanel implements IPanel {
      * @param panel
      *     the panel to be added.
      */
-    public void addNextPanel(final IPanel panel) {
-        if (!this.equals(panel)) {
-            nextPanels.add(panel);
+    public void addNextPanel(final AbstractPanel panel) {
+        if (!this.equals(panel) && this.getPanelID()!=panel.getPanelID()) {
+            boolean IDRepeated = false;
+            for (AbstractPanel contained_panel: nextPanels) {
+                if (contained_panel.equals(panel)) {
+                    IDRepeated = true;
+                    break;
+                }
+            }
+            if (!IDRepeated) {
+                nextPanels.add(panel);
+            }
         }
     }
 
+    /**
+     * Executes the appropriate action to the player according to the panel's type.
+     */
+    public abstract void activatedBy(final @NotNull Player player);
 
     /**
      * Creates a new panel
@@ -41,35 +54,15 @@ abstract class AbstractPanel implements IPanel {
         this.panelID = panelID;
     }
 
-    /**
-     * Restores a player's HP in 1.
-     */
-    protected static void applyHealTo(final @NotNull Player player) {
-        player.setCurrentHP(player.getCurrentHP() + 1);
-    }
 
-    /**
-     * Increases the player's star count by the D6 roll multiplied by the maximum between the player's
-     * norma level and three.
-     */
-    protected static void applyBonusTo(final @NotNull Player player) {
-        player.increaseStarsBy(player.roll() * Math.min(player.getNormaLevel(), 3));
-    }
 
-    /**
-     * Reduces the player's star count by the D6 roll multiplied by the player's norma level.
-     */
-    protected static void applyDropTo(final @NotNull Player player) {
-        player.reduceStarsBy(player.roll() * player.getNormaLevel());
-    }
 
-    /**
-     * Executes the appropriate action to the player according to the panel's type.
-     */
-    public abstract void activatedBy(final Player player);
+
+
 
     @Override
     public int hashCode() {
+        System.out.println("Hello-hashCode");
         return Objects.hash(getPanelID(), getNextPanels(), getClass());
     }
 
@@ -80,14 +73,19 @@ abstract class AbstractPanel implements IPanel {
 
     @Override
     public boolean equals(Object o) {
+        System.out.println("Hello-equals");
+        boolean typeMatch;
+        boolean IDMatch;
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AbstractPanel)) {
+        typeMatch = (o instanceof AbstractPanel);
+        if (!typeMatch) {
             return false;
         }
         final AbstractPanel otherPanel = (AbstractPanel) o;
-        return this.getPanelID() == otherPanel.getPanelID();
+        IDMatch = (this.getPanelID() == otherPanel.getPanelID());
+        return (IDMatch);
 
     }
 
