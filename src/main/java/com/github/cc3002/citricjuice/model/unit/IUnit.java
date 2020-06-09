@@ -1,6 +1,4 @@
-package com.github.cc3002.citricjuice.model;
-
-import java.util.Random;
+package com.github.cc3002.citricjuice.model.unit;
 
 /**
  * This class represents a player in the game 99.7% Citric Liquid.

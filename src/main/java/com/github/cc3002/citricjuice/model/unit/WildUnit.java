@@ -1,9 +1,9 @@
-package com.github.cc3002.citricjuice.model;
+package com.github.cc3002.citricjuice.model.unit;
 
-public class BossUnit extends AbstractUnit {
+public class WildUnit extends AbstractUnit {
 
     /**
-     * Creates a new boss unit.
+     * Creates a new wild unit.
      *
      * @param name
      *     the character's name.
@@ -16,20 +16,21 @@ public class BossUnit extends AbstractUnit {
      * @param evd
      *     the base evasion of the character.
      */
-    public BossUnit(final String name, final int hp, final int atk, final int def,
+    public WildUnit(final String name, final int hp, final int atk, final int def,
                     final int evd) {
         super(name, hp, atk, def, evd);
     }
+
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof BossUnit)) {
+        if (!(o instanceof WildUnit)) {
             return false;
         }
-        final BossUnit player = (BossUnit) o;
+        final WildUnit player = (WildUnit) o;
         return getMaxHP() == player.getMaxHP() &&
                 getAtk() == player.getAtk() &&
                 getDef() == player.getDef() &&
@@ -40,13 +41,13 @@ public class BossUnit extends AbstractUnit {
     }
 
     @Override
-    public BossUnit copy() {
-        return new BossUnit(name, maxHP, atk, def, evd);
+    public WildUnit copy() {
+        return new WildUnit(name, maxHP, atk, def, evd);
     }
 
     @Override
     void defeatedBy(AbstractUnit attacker) {
-        attacker.winAgainstBossUnit(this);
+        attacker.winAgainstWildUnit(this);
     }
 
     @Override

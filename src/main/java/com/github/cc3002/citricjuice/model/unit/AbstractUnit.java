@@ -1,4 +1,6 @@
-package com.github.cc3002.citricjuice.model;
+package com.github.cc3002.citricjuice.model.unit;
+
+import com.github.cc3002.citricjuice.model.board.IPanel;
 
 import java.util.Random;
 
@@ -71,6 +73,7 @@ public abstract class AbstractUnit implements IUnit {
   public int getWins() {
     return wins;
   }
+
 
 
   /**
@@ -273,6 +276,4 @@ public abstract class AbstractUnit implements IUnit {
    * @param bossunit the enemy boss unit that this unit has just defeated.
    */
   abstract void winAgainstBossUnit(BossUnit bossunit);
-
-
 }

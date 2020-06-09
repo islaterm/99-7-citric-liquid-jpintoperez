@@ -1,21 +1,32 @@
 package com.github.cc3002.citricjuice.model.board;
 
-import com.github.cc3002.citricjuice.model.Player;
+import com.github.cc3002.citricjuice.model.unit.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-abstract class AbstractPanel implements IPanel {
-    private final Set<AbstractPanel> nextPanels = new HashSet<>();
+public abstract class AbstractPanel implements IPanel {
+    private final List<IPanel> nextPanels = new ArrayList<>();
     private final int panelID;
+    private List<Player> players = new ArrayList<>();
+
+    public void addPlayer(Player player) {
+        players.add(player);
+    }
+
+    public void removePlayer(Player player) {
+        players.remove(player);
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
 
     /**
      * Returns a copy of this panel's next ones.
      */
-    public Set<AbstractPanel> getNextPanels() {
-        return Set.copyOf(nextPanels);
+    public List<IPanel> getNextPanels() {
+        return List.copyOf(nextPanels);
     }
 
     /**
@@ -24,10 +35,10 @@ abstract class AbstractPanel implements IPanel {
      * @param panel
      *     the panel to be added.
      */
-    public void addNextPanel(final AbstractPanel panel) {
+    public void addNextPanel(final IPanel panel) {
         if (!this.equals(panel) && this.getPanelID()!=panel.getPanelID()) {
             boolean IDRepeated = false;
-            for (AbstractPanel contained_panel: nextPanels) {
+            for (IPanel contained_panel: nextPanels) {
                 if (contained_panel.equals(panel)) {
                     IDRepeated = true;
                     break;
@@ -62,7 +73,6 @@ abstract class AbstractPanel implements IPanel {
 
     @Override
     public int hashCode() {
-        System.out.println("Hello-hashCode");
         return Objects.hash(getPanelID(), getNextPanels(), getClass());
     }
 
@@ -73,7 +83,6 @@ abstract class AbstractPanel implements IPanel {
 
     @Override
     public boolean equals(Object o) {
-        System.out.println("Hello-equals");
         boolean typeMatch;
         boolean IDMatch;
         if (this == o) {
