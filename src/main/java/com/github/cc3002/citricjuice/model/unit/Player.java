@@ -1,6 +1,14 @@
-package com.github.cc3002.citricjuice.model;
+package com.github.cc3002.citricjuice.model.unit;
 
-import java.util.Random;
+import com.github.cc3002.citricjuice.model.board.IPanel;
+import com.github.cc3002.citricjuice.model.board.NullPanel;
+import com.github.cc3002.citricjuice.model.norma.INormaGoal;
+import com.github.cc3002.citricjuice.model.norma.NormaFactory;
+import com.github.cc3002.citricliquid.controller.GameController;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeSupport;
+
 
 /**
  * This class represents a player in the game 99.7% Citric Liquid.
@@ -11,6 +19,21 @@ import java.util.Random;
  * @since 1.0
  */
 public class Player extends AbstractUnit {
+
+  protected IPanel currentPanel = NullPanel.getNullPanel();
+  protected IPanel homePanel = NullPanel.getNullPanel();
+  protected INormaGoal goal;
+  // Observable
+  private PropertyChangeSupport changes;
+
+  /**
+   * Adds an instance of GameController as an observer.
+   * @param controller
+   *    instance of a game controller to be added to subscribers.
+   */
+  public void addObserver(GameController controller) {
+    changes.addPropertyChangeListener(controller);
+  }
 
   /**
    * Creates a new character.
@@ -30,8 +53,50 @@ public class Player extends AbstractUnit {
                 final int evd) {
     super(name, hp, atk, def, evd);
     normaLevel = 1;
+    setNormaGoal(NormaFactory.getStarsNorma(1));
+    // Initializes the observable structure
+    changes = new PropertyChangeSupport(this);
   }
 
+
+
+  /**
+   * Returns the Norma Goal of this player.
+   */
+  public INormaGoal getNormaGoal() { return goal; }
+
+  public void setNormaGoal(INormaGoal goal) {
+    this.goal = goal;
+  }
+
+  public boolean normaCheck() {
+    return getNormaGoal().normaCheck(this);
+  }
+  /**
+   * Set this unit on a certain panel.
+   */
+  public void setCurrentPanel(IPanel panel) {
+    currentPanel.removePlayer(this);
+    this.currentPanel = panel;
+    currentPanel.addPlayer(this);
+  }
+
+  /**
+   * Gets this unit's current panel.
+   */
+  public IPanel getCurrentPanel() { return this.currentPanel; }
+
+  /**
+   * Set this unit on a certain panel.
+   */
+  public void setHomePanel(IPanel panel) {
+    this.homePanel = panel;
+  }
+
+  /**
+   * Gets this unit's home panel.
+   */
+  public IPanel getHomePanel() { return this.homePanel; }
 
   /**
    * Returns the current norma level
@@ -45,6 +110,7 @@ public class Player extends AbstractUnit {
    */
   public void normaClear() {
     normaLevel++;
+    changes.firePropertyChange(new PropertyChangeEvent(this, "normaLevel", this.normaLevel-1, this.normaLevel));
   }
 
   /***

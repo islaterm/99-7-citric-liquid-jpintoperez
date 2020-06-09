@@ -1,10 +1,11 @@
 package com.github.cc3002.citricjuice.model.board;
 
-import com.github.cc3002.citricjuice.model.Player;
+import com.github.cc3002.citricjuice.model.unit.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -60,6 +61,31 @@ class PanelTest {
   }
 
   @Test
+  public void nullPanelTest() {
+    IPanel panel1 = NullPanel.getNullPanel();
+    IPanel panel2 = NullPanel.getNullPanel();
+
+    // Should be a unique instance
+    assertEquals(panel1,panel2);
+    // Adding panels shouldn't work, will throw warnings
+    panel1.addNextPanel(panel2);
+    panel1.addPlayer(suguri);
+    panel1.removePlayer(suguri);
+
+
+    // Shouldn't have next panels
+    List<IPanel> expectedNextPanels = List.of();
+    assertEquals(expectedNextPanels,panel1.getNextPanels());
+
+    // Shouldn't have players
+    List<Player> expectedPlayers = List.of();
+    assertEquals(expectedPlayers, panel1.getPlayers());
+
+    assertEquals(panel1.getPanelID(), -1);
+
+
+  }
+  @Test
   public void nextPanelTest() {
     assertTrue(testNeutralPanel.getNextPanels().isEmpty());
     final var expectedPanel1 = new NeutralPanel(6);
@@ -85,7 +111,7 @@ class PanelTest {
     testNeutralPanel.addNextPanel(sameIDasAddedPanel);
     assertEquals(2, testNeutralPanel.getNextPanels().size());
 
-    assertEquals(Set.of(expectedPanel1, expectedPanel2),
+    assertEquals(List.of(expectedPanel1, expectedPanel2),
                  testNeutralPanel.getNextPanels());
   }
 
