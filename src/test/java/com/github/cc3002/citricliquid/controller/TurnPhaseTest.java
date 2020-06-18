@@ -1,5 +1,6 @@
 package com.github.cc3002.citricliquid.controller;
 
+import com.github.cc3002.citricjuice.model.board.HomePanel;
 import com.github.cc3002.citricjuice.model.board.IPanel;
 import com.github.cc3002.citricjuice.model.unit.Player;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,5 +92,32 @@ public class TurnPhaseTest {
     controller.finishTurn();
   }
 
+  @Test
+  void stopAtHomeTest() {
+    GameController controller1 = new GameController();
+    IPanel panel1 = controller1.createNeutralPanel(0);
+    IPanel panel2 = controller1.createNeutralPanel(1);
+    IPanel panel3 = controller1.createNeutralPanel(2);
+    IPanel panel4 = controller1.createHomePanel(3);
+    controller1.setNextPanel(panel1,panel2);
+    controller1.setNextPanel(panel2,panel3);
+    controller1.setNextPanel(panel3,panel4);
+    controller1.setNextPanel(panel4,panel1);
+    Player suguri1 = controller1.createPlayer("Suguri",4,1,-1, 2, panel1);
+    suguri1.setCurrentHP(1);
+    controller1.setPlayerHome(suguri1,(HomePanel) panel4);
+
+    controller1.beginTurn();
+    controller1.useCard();
+    controller1.movePlayer(17);
+    controller1.stopAtHome();
+    assertEquals(1,suguri1.getCurrentHP());
+    assertEquals(panel4, suguri1.getCurrentPanel());
+    controller1.finishTurn();
+    assertEquals(2,suguri1.getCurrentHP());
+    assertEquals(2,controller1.getChapter());
+
+
+  }
 
 }

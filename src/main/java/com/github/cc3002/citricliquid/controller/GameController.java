@@ -66,6 +66,11 @@ public class GameController implements PropertyChangeListener {
     // basically it will just skip to moving phase but it is here as a placeholder.
     turnPhase.movingPhase();
   }
+  public void placePlayer(IPanel panel) {
+    Player player = getTurnOwner();
+    player.setCurrentPanel(panel);
+  }
+
   /**
    * Moves the player an amount of steps ahead, if it has to stop it will return the amount of steps remaining
    * on the movement.
@@ -116,6 +121,14 @@ public class GameController implements PropertyChangeListener {
    */
   public void stopAtHome() {
     turnPhase.endPhase();
+  }
+
+  public void continueMovingThrough(IPanel panel) {
+    int steps = turnPhase.getSteps();
+    placePlayer(panel);
+    steps--;
+    turnPhase.movingPhase();
+    movePlayer(steps);
   }
 
   /**
