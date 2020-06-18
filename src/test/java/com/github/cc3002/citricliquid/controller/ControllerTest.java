@@ -82,13 +82,18 @@ public class ControllerTest {
     player1.normaClear();
     player1.normaClear();
     controller.setCurrPlayerNormaGoal(NormaFactory.getStarsNorma(5));
-    controller.movePlayer();
-    controller.movePlayer();
-    controller.movePlayer();
+    controller.beginTurn();
+    controller.useCard();
+    controller.movePlayer(3);
+    controller.finishTurn();
     // We force this player to win the game by passing them the final amount
     // of stars before reaching norma check.
     player1.increaseStarsBy(200);
-    controller.movePlayer();
+    controller.beginTurn();
+    controller.useCard();
+    int move = controller.movePlayer(1);
+    controller.finishTurn();
+    assertEquals(move,0);
 
     assertEquals(true, controller.getGameEnded(), "Game hasn't ended and it should have ended!");
     assertEquals(player1, controller.getWinner(), "The winner is not the player that should have won the game!");
@@ -137,23 +142,38 @@ public class ControllerTest {
 
     Player testSuguri = controller.createPlayer("Suguri", 4, 1, -1, 2, panel1 );
 
-    controller.movePlayer();
+    controller.beginTurn();
+    controller.useCard();
+    controller.movePlayer(1);
+    controller.finishTurn();
     IPanel expectedPanel = panel2;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.movePlayer();
+    controller.beginTurn();
+    controller.useCard();
+    controller.movePlayer(1);
+    controller.finishTurn();
     expectedPanel = panel3;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.movePlayer();
+    controller.beginTurn();
+    controller.useCard();
+    controller.movePlayer(1);
+    controller.finishTurn();
     expectedPanel = panel4;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.movePlayer();
+    controller.beginTurn();
+    controller.useCard();
+    controller.movePlayer(1);
+    controller.finishTurn();
     expectedPanel = panel5;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.movePlayer();
+    controller.beginTurn();
+    controller.useCard();
+    controller.movePlayer(1);
+    controller.finishTurn();
 
     expectedPanel = panel1;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));

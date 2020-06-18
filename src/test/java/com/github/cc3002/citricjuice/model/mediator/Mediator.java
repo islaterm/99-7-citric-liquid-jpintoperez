@@ -8,6 +8,7 @@ import com.github.cc3002.citricliquid.controller.GameController;
 import com.github.cc3002.citricjuice.model.norma.*;
 import com.github.cc3002.citricjuice.model.board.HomePanel;
 import com.github.cc3002.citricjuice.model.board.*;
+import com.github.cc3002.citricliquid.controller.MovingPhase;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -144,6 +145,21 @@ public class Mediator {
   @Nullable
   public MediatorPlayer<?> getWinner() {
     return new MediatorPlayer(controller.getWinner());
+  }
+
+
+  /**
+   * Forcing a moving phase for testing utility.
+   */
+  public void forceMovingPhase() {
+    controller.setTurnPhase(new MovingPhase());
+  }
+
+  /**
+   * Forcing a moving phase for testing utility.
+   */
+  public void finishTurn() {
+    controller.finishTurn();
   }
 
   /**
