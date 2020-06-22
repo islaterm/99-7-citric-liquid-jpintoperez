@@ -1,4 +1,4 @@
-package com.github.cc3002.citricliquid.controller;
+package com.github.cc3002.citricliquid.controller.gameflowstates;
 
 public class HomeStopChoosePhase extends TurnPhase {
   int steps;
@@ -11,11 +11,11 @@ public class HomeStopChoosePhase extends TurnPhase {
     return steps;
   }
   @Override
-  void movingPhase() {
+  public void movingPhase() {
     changeTurnPhase(new MovingPhase());
   }
 
   @Override
-  void endPhase() { changeTurnPhase(new EndPhase()); }
+  public void endPhase() { changeTurnPhase(new EndPhase()); }
 
 }

@@ -1,9 +1,9 @@
-package com.github.cc3002.citricliquid.controller;
+package com.github.cc3002.citricliquid.controller.gameflowstates;
 
 public class StartPhase extends TurnPhase {
 
   @Override
-  void cardPickPhase() {
+  public void cardPickPhase() {
     changeTurnPhase(new CardPickPhase());
   }
 

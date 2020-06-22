@@ -116,8 +116,6 @@ public class TurnPhaseTest {
     controller1.finishTurn();
     assertEquals(2,suguri1.getCurrentHP());
     assertEquals(2,controller1.getChapter());
-
-
   }
 
 }

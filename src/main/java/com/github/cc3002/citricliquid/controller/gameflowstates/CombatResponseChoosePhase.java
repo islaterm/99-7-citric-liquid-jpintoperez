@@ -1,4 +1,4 @@
-package com.github.cc3002.citricliquid.controller;
+package com.github.cc3002.citricliquid.controller.gameflowstates;
 
 import com.github.cc3002.citricjuice.model.unit.Player;
 
@@ -15,7 +15,7 @@ public class CombatResponseChoosePhase extends TurnPhase {
   }
 
   @Override
-  void endPhase() {
+  public void endPhase() {
     changeTurnPhase(new EndPhase());
   }
 

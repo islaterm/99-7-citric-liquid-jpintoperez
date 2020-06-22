@@ -1,10 +1,13 @@
 package com.github.cc3002.citricliquid.controller;
 
+import com.github.cc3002.citricjuice.model.board.*;
+import com.github.cc3002.citricjuice.model.norma.INormaGoal;
+import com.github.cc3002.citricjuice.model.norma.StarsNorma;
 import com.github.cc3002.citricjuice.model.unit.BossUnit;
 import com.github.cc3002.citricjuice.model.unit.Player;
-import com.github.cc3002.citricjuice.model.board.*;
-import com.github.cc3002.citricjuice.model.norma.*;
 import com.github.cc3002.citricjuice.model.unit.WildUnit;
+import com.github.cc3002.citricliquid.controller.gameflowstates.StartPhase;
+import com.github.cc3002.citricliquid.controller.gameflowstates.TurnPhase;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -86,6 +89,7 @@ public class GameController implements PropertyChangeListener {
 
       // Has to take a decision over which panel to take first
       if (nextPanels.size() > 1) {
+        turnPhase.pathChoosePhase(steps);
         return steps;
       }
       // There's only one option of nextPanel
@@ -212,6 +216,7 @@ public class GameController implements PropertyChangeListener {
     }
   }
 
+  //region Panel creation methods
 
   /**
    * Creates a bonus panel
@@ -225,6 +230,12 @@ public class GameController implements PropertyChangeListener {
     panels.add(newPanel);
     return newPanel;
   }
+
+  /**
+   * Creates a boss panel
+   * @param id
+   * @return
+   */
   public BossPanel createBossPanel(int id) {
     BossPanel newPanel = new BossPanel(id);
     panels.add(newPanel);
@@ -251,6 +262,8 @@ public class GameController implements PropertyChangeListener {
     panels.add(newPanel);
     return newPanel;
   }
+
+  //endregion Panel creation methods
 
   /***
    * Creates a player and adds it to the player list.

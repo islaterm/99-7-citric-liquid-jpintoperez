@@ -1,4 +1,4 @@
-package com.github.cc3002.citricliquid.controller;
+package com.github.cc3002.citricliquid.controller.gameflowstates;
 
 public class PathChoosePhase extends TurnPhase {
   int steps;
@@ -14,7 +14,7 @@ public class PathChoosePhase extends TurnPhase {
   }
 
   @Override
-  void movingPhase() {
+  public void movingPhase() {
     changeTurnPhase(new MovingPhase());
   }
 }
