@@ -6,8 +6,7 @@ import com.github.cc3002.citricjuice.model.norma.StarsNorma;
 import com.github.cc3002.citricjuice.model.unit.BossUnit;
 import com.github.cc3002.citricjuice.model.unit.Player;
 import com.github.cc3002.citricjuice.model.unit.WildUnit;
-import com.github.cc3002.citricliquid.controller.gameflowstates.StartPhase;
-import com.github.cc3002.citricliquid.controller.gameflowstates.TurnPhase;
+import com.github.cc3002.citricliquid.controller.gameflowstates.TurnState;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -21,10 +20,10 @@ public class GameController implements PropertyChangeListener {
   private int chapter = 1;
   private int turn = 0;
   private boolean gameEnded = false;
-  private TurnPhase turnPhase;
+  private TurnState turnState;
 
   public GameController() {
-    setTurnPhase(new StartPhase());
+    turnState = new TurnState();
   }
 
   /**
@@ -44,103 +43,94 @@ public class GameController implements PropertyChangeListener {
     player.increaseStarsBy(extraStars);
   }
 
+  //region Interface interaction methods
   /**
-   * Sets the turn phase to a certain state
-   * @param
+   * Should be called when the player decides to move
    */
-  public void setTurnPhase(TurnPhase phase) {
-    turnPhase = phase;
-    phase.setController(this);
+  public int doMove(int steps) {
+    steps=movePlayer(steps);
+    Player player = getTurnOwner();
+
+
+    // if there's a player:
+    if (player.getCurrentPanel().getPlayers().size() > 1) {
+      turnState.combatChoosePhase(steps);
+      return steps;
+    }
+
+    if (steps > 0) {
+      // if i'm at home panel:
+      if (player.getCurrentPanel().equals(player.getHomePanel())) {
+        turnState.homeStopChoosePhase(steps);
+        return steps;
+      }
+
+    } else {
+      turnState.endPhase();
+      return steps;
+    }
+
+    return steps;
+  }
+
+  public int doMove() {
+    Player player = getTurnOwner();
+    return doMove(player.roll());
   }
 
   /**
-   * Gives the player begin-turn stars and transitions to card picking phase.
+   * Should be called when the player turn starts.
    */
   public void beginTurn() {
     giveBeginTurnStars();
-    turnPhase.cardPickPhase();
+    turnState.cardPickPhase();
   }
 
   /**
-   * Picks a card to use, when no card is used NullCard might be passed as argument.
+   * Picks a card to use, when no card is used NullCard might be passed as argument, cards are not
+   * yet implemented so this method is.
    */
   public void useCard() {
     // Not really implemented yet since there are no cards on this version,
     // basically it will just skip to moving phase but it is here as a placeholder.
-    turnPhase.movingPhase();
+    turnState.movingPhase();
   }
+
+  /**
+   * Sets a player on a certain panel.
+   * @param panel
+   */
   public void placePlayer(IPanel panel) {
     Player player = getTurnOwner();
     player.setCurrentPanel(panel);
   }
 
   /**
-   * Moves the player an amount of steps ahead, if it has to stop it will return the amount of steps remaining
-   * on the movement.
-   * @param steps
-   */
-  public int movePlayer(int steps) {
-
-    Player player = getTurnOwner();
-
-    while (steps > 0) {
-      IPanel stepPanel = getPlayerPanel(player);
-      List<IPanel> nextPanels = stepPanel.getNextPanels();
-
-      // Has to take a decision over which panel to take first
-      if (nextPanels.size() > 1) {
-        turnPhase.pathChoosePhase(steps);
-        return steps;
-      }
-      // There's only one option of nextPanel
-      IPanel nextPanel = nextPanels.get(0);
-      player.setCurrentPanel(nextPanel);
-      steps--;
-
-      if (steps > 0) { // Checks to stop if has to keep walking
-        // Walks through/lands on their own HomePanel.
-        if (player.getHomePanel().equals(player.getCurrentPanel())) {
-          // Turn phase -> must go to choosing if wants to stay in Home Phase.
-          turnPhase.homeStopChoosePhase(steps);
-          return steps;
-        }
-        // Has to decide if to combat or not
-        if (player.getCurrentPanel().getPlayers().size() >= 2) {
-          // Turn phase -> must go to choosing if wants to engage in combat.
-          turnPhase.combatChoosePhase(steps);
-          return steps;
-        }
-      }
-    }
-
-    // Successfully did all the steps, therefore we proceed to end phase.
-
-    turnPhase.endPhase();
-    return steps;
-
-  };
-
-  /**
    * Stops at the current panel when prompted if to stay at homePanel or keep moving and transitions to endPhase.
    */
   public void stopAtHome() {
-    turnPhase.endPhase();
+    turnState.endPhase();
   }
 
+  /**
+   * Tells the game that the player picks to continue moving and it specifies which one of the next
+   * panels he is picking to continue moving.
+   * @param panel
+   */
   public void continueMovingThrough(IPanel panel) {
-    int steps = turnPhase.getSteps();
+    int steps = turnState.getSteps();
     placePlayer(panel);
     steps--;
-    turnPhase.movingPhase();
-    movePlayer(steps);
+    turnState.movingPhase();
+    doMove(steps);
   }
 
   /**
    * Continues moving instead of stopping at home or starting a combat.
    */
   public void continueMoving() {
-    int steps = turnPhase.getSteps();
-    turnPhase.movingPhase();
+    int steps = turnState.getSteps();
+    turnState.movingPhase();
     movePlayer(steps);
   }
 
@@ -157,7 +147,6 @@ public class GameController implements PropertyChangeListener {
     if (!players.get(0).equals(player)) { startCombat(players.get(0)); } else {
       startCombat(players.get(1));
     }
-
   }
 
   /**
@@ -167,29 +156,29 @@ public class GameController implements PropertyChangeListener {
   public void startCombat(Player target) {
     Player attacker = getTurnOwner();
     int attackValue = attacker.getAttackRoll();
-    turnPhase.combatResponseChoosePhase(attacker, attackValue, target);
-  }
-
-  /**
-   * Replies to the combat request by defending.
-   */
-  public void defendAgainstCombat() {
-    Player attacker = turnPhase.getAttacker();
-    int attackValue = turnPhase.getAttackValue();
-    Player target = turnPhase.getTarget();
-    target.defendAttack(attacker, attackValue);
-    turnPhase.endPhase();
+    turnState.combatResponseChoosePhase(attacker, attackValue, target);
   }
 
   /**
    * Replies to the combat request by evading.
    */
   public void evadeAgainstCombat() {
-    Player attacker = turnPhase.getAttacker();
-    int attackValue = turnPhase.getAttackValue();
-    Player target = turnPhase.getTarget();
+    Player attacker = turnState.getAttacker();
+    int attackValue = turnState.getAttackValue();
+    Player target = turnState.getTarget();
     target.evadeAttack(attacker, attackValue);
-    turnPhase.endPhase();
+    turnState.endPhase();
+  }
+
+  /**
+   * Replies to the combat request by defending.
+   */
+  public void defendAgainstCombat() {
+    Player attacker = turnState.getAttacker();
+    int attackValue = turnState.getAttackValue();
+    Player target = turnState.getTarget();
+    target.defendAttack(attacker, attackValue);
+    turnState.endPhase();
   }
 
   /**
@@ -200,8 +189,50 @@ public class GameController implements PropertyChangeListener {
     IPanel panel = player.getCurrentPanel();
     panel.activatedBy(player);
     endTurn();
+    turnState.startPhase();
+  }
+  //endregion Interface interaction methods
 
-    turnPhase.startPhase();
+  /**
+   * Rolls the current turn owner's dice and invokes movePlayer.
+   * @return
+   */
+  public int movePlayer() {
+    Player player = getTurnOwner();
+    int steps = player.roll();
+    return movePlayer(steps);
+  }
+
+  protected int movePlayer(int steps) {
+    Player player = getTurnOwner();
+
+    while(steps>0) {
+      IPanel stepPanel = getPlayerPanel(player);
+      List<IPanel> nextPanels = stepPanel.getNextPanels();
+
+      // more than one next panel: (should stop to decide which path to take)
+      if (nextPanels.size() > 1) {
+        return steps;
+      }
+      // passed this line it means there's only 1 next panel available therefore we must advance
+      IPanel nextPanel = nextPanels.get(0);
+      player.setCurrentPanel(nextPanel);
+      steps--;
+
+      if (steps > 0) {
+        // has to stop to ask if wants to stay at home panel or keep walking
+        if (nextPanel.equals(player.getHomePanel())) {
+          return steps;
+        }
+        // has to stop to ask if wants to engage in combat
+        if (nextPanel.getPlayers().size() > 1) {
+          return steps;
+        }
+      }
+    }
+
+    player.getCurrentPanel().activatedBy(player);
+    return steps;
   }
 
 
@@ -340,15 +371,7 @@ public class GameController implements PropertyChangeListener {
     return player.normaCheck();
   }
 
-  /**
-   * Rolls the current turn owner's dice and invokes movePlayer.
-   * @return
-   */
-  public int movePlayer() {
-    Player player = getTurnOwner();
-    int steps = player.roll();
-    return movePlayer(steps);
-  }
+
 
 
   public IPanel getPlayerPanel(Player player) {

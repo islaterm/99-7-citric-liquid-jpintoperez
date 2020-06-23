@@ -1,21 +1,20 @@
 package com.github.cc3002.citricliquid.controller.gameflowstates;
 
 import com.github.cc3002.citricjuice.model.unit.Player;
-import com.github.cc3002.citricliquid.controller.GameController;
 
 public class TurnPhase {
 
-  private GameController controller;
+  private TurnState state;
 
-  public void setController(GameController controller) {
-    this.controller = controller;
+  public void setTurnState(TurnState state) {
+    this.state = state;
   }
 
   protected void changeTurnPhase(TurnPhase phase) {
-    controller.setTurnPhase(phase);
+    state.setTurnPhase(phase);
   }
 
-  void error() { throw new RuntimeException(); };
+  void error() { throw new AssertionError("Invalid transition"); };
 
   public void startPhase() { error(); }
   public void cardPickPhase() { error(); }
