@@ -1,7 +1,5 @@
 package com.github.cc3002.citricjuice.model.unit;
 
-import com.github.cc3002.citricjuice.model.board.IPanel;
-
 import java.util.Random;
 
 /**
@@ -159,7 +157,7 @@ public abstract class AbstractUnit implements IUnit {
    * Each subunit must implement this according to their unique
    * parameters.
    */
-  public abstract AbstractUnit copy();
+  public abstract IUnit copy();
 
   /**
    * Returns true if the units HP is 0 and therefore is KO'd.
@@ -213,7 +211,7 @@ public abstract class AbstractUnit implements IUnit {
    * @param attacker The unit that's attacking this unit.
    * @param incomingDamage The value of the incoming damage to defend.
    */
-  public void defendAttack(AbstractUnit attacker, int incomingDamage) {
+  public void defendAttack(IUnit attacker, int incomingDamage) {
     int total;
     int value = getDefenseRoll();
 
@@ -235,7 +233,7 @@ public abstract class AbstractUnit implements IUnit {
    * @param attacker The unit that's attacking this unit.
    * @param incomingDamage The value of the incoming damage to evade.
    */
-  public void evadeAttack(AbstractUnit attacker, int incomingDamage) {
+  public void evadeAttack(IUnit attacker, int incomingDamage) {
     int total;
     int value = getEvasionRoll();
 
@@ -256,24 +254,24 @@ public abstract class AbstractUnit implements IUnit {
    * Performs the respective action of telling the attacker that it has defeated this unit.
    * @param attacker the enemy unit that defeated this one.
    */
-  abstract void defeatedBy(AbstractUnit attacker);
+  abstract void defeatedBy(IUnit attacker);
 
   /***
    * Should take a certain portion of the player's stars and get victories. It may vary between each subclass.
    * @param player the enemy player that this unit has just defeated.
    */
-  abstract void winAgainstPlayer(Player player);
+  public abstract void winAgainstPlayer(IUnit player);
 
   /***
    * Should take a certain portion of the wild unit's stars and get victories. It may vary in amounts between each
    * subclass.
    * @param wildunit the enemy wild unit that this unit has just defeated.
    */
-  abstract void winAgainstWildUnit(WildUnit wildunit);
+  public abstract void winAgainstWildUnit(IUnit wildunit);
   /***
    * Should take a certain portion of the boss unit's stars and get victories. It may vary in amounts between each
    * subclass.
    * @param bossunit the enemy boss unit that this unit has just defeated.
    */
-  abstract void winAgainstBossUnit(BossUnit bossunit);
+  public abstract void winAgainstBossUnit(IUnit bossunit);
 }

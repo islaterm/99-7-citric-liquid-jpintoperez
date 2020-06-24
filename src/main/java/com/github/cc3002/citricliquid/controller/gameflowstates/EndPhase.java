@@ -7,4 +7,9 @@ public class EndPhase extends TurnPhase {
     changeTurnPhase(new StartPhase());
   }
 
+  @Override
+  public boolean isEndPhase() {
+    return true;
+  }
+
 }

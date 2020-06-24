@@ -17,4 +17,10 @@ public class PathChoosePhase extends TurnPhase {
   public void movingPhase() {
     changeTurnPhase(new MovingPhase());
   }
+
+  @Override
+  public boolean isPathChoosePhase() {
+    return true;
+  }
+
 }

@@ -40,6 +40,11 @@ public interface IUnit {
     int roll();
 
     /**
+     * Returns an attack roll from said unit.
+     */
+    int getAttackRoll();
+
+    /**
      * Returns the character's name.
      */
     String getName();
@@ -75,6 +80,33 @@ public interface IUnit {
      * The character's hit points have a constraint to always be between 0 and maxHP, both inclusive.
      */
     void setCurrentHP(final int newHP);
+
+    /**
+     * Returns if the unit is knocked out.
+     */
+    boolean isKOd();
+
+    /**
+     * Performs the defense action against a determined attacker and incoming damage.
+     * @param attacker
+     *   the attacker unit's reference
+     * @param incomingDamage
+     *   the incoming damage to defend from.
+     */
+    void defendAttack(IUnit attacker, int incomingDamage);
+
+    /**
+     * Performs the evade action against a determined attacker and incoming damage.
+     * @param attacker
+     *  the attacker unit's reference
+     * @param incomingDamage
+     *  the incoming damage to evade from.
+     */
+    void evadeAttack(IUnit attacker, int incomingDamage);
+
+    void winAgainstPlayer(IUnit unit);
+    void winAgainstWildUnit(IUnit unit);
+    void winAgainstBossUnit(IUnit unit);
 
     /**
      * Returns a copy of this character.

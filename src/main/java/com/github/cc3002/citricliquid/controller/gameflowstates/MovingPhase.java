@@ -21,4 +21,10 @@ public class MovingPhase extends TurnPhase {
   public void endPhase() {
     changeTurnPhase(new EndPhase());
   }
+
+  @Override
+  public boolean isMovingPhase() {
+    return true;
+  }
+
 }

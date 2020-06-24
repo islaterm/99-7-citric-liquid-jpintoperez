@@ -4,6 +4,7 @@ import com.github.cc3002.citricjuice.model.mediator.Mediator;
 import com.github.cc3002.citricjuice.model.norma.StarsNorma;
 import com.github.cc3002.citricjuice.model.norma.WinsNorma;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ class MediatorTest {
     assertEquals(new StarsNorma(120), player.getNormaGoal());
   }
 
-  @Test
+  @RepeatedTest(100)
   public void testStarsNorma() {
     var bonusPanel = panelSuppliers.get(0).apply(1);
     var homePanel = mediator.createHomePanel(2);
@@ -134,9 +135,10 @@ class MediatorTest {
     int expectedLevel = 1;
     assertEquals(expectedLevel++, player.getNormaLevel(), "Player should start with level 1.");
     for (int starGoal : List.of(10, 30, 70, 120, 200)) {
+      mediator.movePlayer(); // <-- Agreguen esta línea
       while (player.getStars() < starGoal) {
         mediator.movePlayer();
-        }
+      }
       while (!homePanel.getPlayers().equals(List.of(player))) {
         mediator.movePlayer();
       }

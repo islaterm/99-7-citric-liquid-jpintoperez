@@ -3,7 +3,9 @@ package com.github.cc3002.citricjuice.model.board;
 import com.github.cc3002.citricjuice.model.unit.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class AbstractPanel implements IPanel {
     private final List<IPanel> nextPanels = new ArrayList<>();
@@ -73,7 +75,7 @@ public abstract class AbstractPanel implements IPanel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPanelID(), getNextPanels(), getClass());
+        return Objects.hash(getPanelID(), getNextPanels().size(), getClass());
     }
 
     @Override
@@ -88,11 +90,11 @@ public abstract class AbstractPanel implements IPanel {
         if (this == o) {
             return true;
         }
-        typeMatch = (o instanceof AbstractPanel);
+        typeMatch = (o instanceof IPanel);
         if (!typeMatch) {
             return false;
         }
-        final AbstractPanel otherPanel = (AbstractPanel) o;
+        final IPanel otherPanel = (IPanel) o;
         IDMatch = (this.getPanelID() == otherPanel.getPanelID());
         return (IDMatch);
 

@@ -1,17 +1,17 @@
 package com.github.cc3002.citricliquid.controller.gameflowstates;
 
-public class StartPhase extends TurnPhase {
+public class RecoveryPhase extends TurnPhase {
 
-  @Override
   public void cardPickPhase() {
     changeTurnPhase(new CardPickPhase());
   }
 
-  @Override
-  public void recoveryPhase() { changeTurnPhase(new RecoveryPhase()); }
+  public void endPhase() {
+    changeTurnPhase(new EndPhase());
+  }
 
   @Override
-  public boolean isStartPhase() {
+  public boolean isRecoveryPhase() {
     return true;
   }
 }

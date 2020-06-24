@@ -18,4 +18,9 @@ public class HomeStopChoosePhase extends TurnPhase {
   @Override
   public void endPhase() { changeTurnPhase(new EndPhase()); }
 
+  @Override
+  public boolean isHomeStopChoosePhase() {
+    return true;
+  }
+
 }

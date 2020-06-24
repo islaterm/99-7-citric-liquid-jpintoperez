@@ -11,6 +11,11 @@ public class StarsNorma extends AbstractNormaGoal {
   }
 
   @Override
+  public int getRequirement() {
+    return requirement;
+  }
+
+  @Override
   public boolean normaCheck(Player player) {
     int stars = player.getStars();
 

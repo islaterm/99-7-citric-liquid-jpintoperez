@@ -6,4 +6,10 @@ public class CardPickPhase extends TurnPhase {
   public void movingPhase() {
     changeTurnPhase(new MovingPhase());
   }
+
+  @Override
+  public boolean isCardPickPhase() {
+    return true;
+  }
+
 }

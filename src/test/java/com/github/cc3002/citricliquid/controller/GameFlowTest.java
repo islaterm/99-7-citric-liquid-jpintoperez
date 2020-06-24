@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // This set of tests is supposed to simulate the flow of the game and its mechanics and see if it successfully
 // changes between each one of them and performs the expected actions.
@@ -76,14 +77,62 @@ public class GameFlowTest {
     controller.doMove();
     int finalPanel = Math.min(suguriRandom.nextInt(6)+1,4);
     IPanel expectedPanel = circuit.get(finalPanel % circuit.size());
-    assertEquals(suguri.getCurrentPanel(), expectedPanel);
+    assertEquals(expectedPanel, suguri.getCurrentPanel());
     if (suguri.getCurrentPanel()==panel4) {
       // Suguri landed at the same place as Kai so we must decide if to start a combat or continue
       controller.startCombat();
       // Attack is on its way so now it's time for Kai to decide if to defend or evade.
       controller.evadeAgainstCombat();
-      // We can proceed now to finish the turn, this means is Kai's turn.
+      if (!kai.isKOd()) {
+        // If Kai's still alive he has capability to counterattack.
+        controller.startCounterAttack();
+        // Suguri now has to choose if to evade or defend, arbitrarily we'll pick defend.
+        controller.defendAgainstCounterattack();
+      }
       controller.finishTurn();
+      assertTrue(controller.getTurnState().isStartPhase());
+    }
+
+  }
+
+  // Tests moving and attacking if it collides with another player, this time the victim defends.
+  @RepeatedTest(500)
+  void moveAndAttackDefTurnTest() {
+
+    Random random = new Random();
+    Random suguriRandom = new Random();
+    long testSeed = random.nextLong();
+
+    suguri.setSeed(testSeed);
+    suguriRandom.setSeed(testSeed);
+
+    List<IPanel> circuit = List.of(panel0,panel1,panel2,panel3,panel4,panel5,panel6);
+
+    // We're currently in startPhase in chapter 1
+    // Suguri should receive 1 star on the beginning of the turn.
+    controller.beginTurn();
+    assertEquals(1,suguri.getStars());
+    // Pick no card to use so we can get to the moving phase.
+    controller.useCard();
+    // Now we roll the dice and move.
+    controller.doMove();
+    int finalPanel = Math.min(suguriRandom.nextInt(6)+1,4);
+    IPanel expectedPanel = circuit.get(finalPanel % circuit.size());
+    assertEquals(suguri.getCurrentPanel(), expectedPanel);
+    if (suguri.getCurrentPanel()==panel4) {
+      // Suguri landed at the same place as Kai so we must decide if to start a combat or continue
+      controller.startCombat();
+      // Attack is on its way so now it's time for Kai to decide if to defend or evade.
+      controller.defendAgainstCombat();
+      if (!kai.isKOd()) {
+        // If kai didn't get knocked out he is capable of counterattacking now.
+        controller.startCounterAttack();
+        // Suguri now has to choose if to evade or defend, arbitrarily we'll pick evade
+        controller.evadeAgainstCounterattack();
+      }
+
+      controller.finishTurn();
+      assertTrue(controller.getTurnState().isStartPhase());
     }
 
   }
@@ -118,7 +167,7 @@ public class GameFlowTest {
       // Suguri landed at the same place as Kai so we must decide if to start a combat or continue
       controller.continueMoving();
       int additionalMove = roll-stopAtPanel;
-      if (additionalMove > 3) { additionalMove = 3; };
+      if (additionalMove > 3) { additionalMove = 3; }
       // Suguri decided to continue moving, we must check where is she going to end.
       // technically she can't go further than her homePanel because she will be asked if to stop or to continue.
       assertEquals(suguri.getCurrentPanel(),circuit.get(stopAtPanel + additionalMove % 7));
