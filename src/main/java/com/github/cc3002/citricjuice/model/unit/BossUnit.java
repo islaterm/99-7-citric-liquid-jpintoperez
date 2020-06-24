@@ -45,12 +45,12 @@ public class BossUnit extends AbstractUnit {
     }
 
     @Override
-    void defeatedBy(AbstractUnit attacker) {
+    void defeatedBy(IUnit attacker) {
         attacker.winAgainstBossUnit(this);
     }
 
-    @Override
-    void winAgainstPlayer(Player player) {
+
+    public void winAgainstPlayer(IUnit player) {
         this.increaseWinsBy(2);
         int getStars = Math.floorDiv(player.getStars(),2);
         this.increaseStarsBy(getStars);
@@ -58,7 +58,7 @@ public class BossUnit extends AbstractUnit {
     }
 
     @Override
-    void winAgainstWildUnit(WildUnit wildunit) {
+    public void winAgainstWildUnit(IUnit wildunit) {
         this.increaseWinsBy(1);
         int getStars = Math.floorDiv(wildunit.getStars(),2);
         this.increaseStarsBy(getStars);
@@ -66,7 +66,7 @@ public class BossUnit extends AbstractUnit {
     }
 
     @Override
-    void winAgainstBossUnit(BossUnit bossunit) {
+    public void winAgainstBossUnit(IUnit bossunit) {
         this.increaseWinsBy(3);
         int getStars = Math.floorDiv(bossunit.getStars(),2);
         this.increaseStarsBy(getStars);

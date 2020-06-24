@@ -1,15 +1,19 @@
 package com.github.cc3002.citricliquid.controller;
 
 import com.github.cc3002.citricjuice.model.board.*;
+import com.github.cc3002.citricjuice.model.norma.INormaGoal;
 import com.github.cc3002.citricjuice.model.norma.NormaFactory;
-import com.github.cc3002.citricjuice.model.unit.*;
+import com.github.cc3002.citricjuice.model.unit.BossUnit;
+import com.github.cc3002.citricjuice.model.unit.Player;
+import com.github.cc3002.citricjuice.model.unit.WildUnit;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerTest {
   GameController controller = new GameController();
@@ -18,7 +22,6 @@ public class ControllerTest {
 
   @BeforeEach
   void ControllerSetUp() {
-    List<Player> Players = new ArrayList();
     controller = new GameController();
     suguri = new Player("Suguri", 4, 1, -1, 2);
     kai = new Player("Kai", 5, 1, 0, 0);
@@ -76,26 +79,20 @@ public class ControllerTest {
 
     Player player1 = controller.createPlayer("Suguri", 4, 1, -1, 2, panel2);
     controller.setPlayerHome(player1, panel1);
-    assertEquals(null, controller.getWinner());
+    assertNull(controller.getWinner());
     player1.normaClear();
     player1.normaClear();
     player1.normaClear();
     player1.normaClear();
     controller.setCurrPlayerNormaGoal(NormaFactory.getStarsNorma(5));
-    controller.beginTurn();
-    controller.useCard();
     controller.movePlayer(3);
-    controller.finishTurn();
     // We force this player to win the game by passing them the final amount
     // of stars before reaching norma check.
     player1.increaseStarsBy(200);
-    controller.beginTurn();
-    controller.useCard();
     int move = controller.movePlayer(1);
-    controller.finishTurn();
     assertEquals(move,0);
 
-    assertEquals(true, controller.getGameEnded(), "Game hasn't ended and it should have ended!");
+    assertTrue(controller.getGameEnded(), "Game hasn't ended and it should have ended!");
     assertEquals(player1, controller.getWinner(), "The winner is not the player that should have won the game!");
 
   }
@@ -127,6 +124,40 @@ public class ControllerTest {
   }
 
   @Test
+  public void setNormaTest() {
+    suguri.normaClear();
+    INormaGoal expected = NormaFactory.getStarsNorma(2);
+    controller.setStarsNorma(suguri);
+    assertEquals(expected, suguri.getNormaGoal());
+    assertEquals(NormaFactory.getStarsNorma(2).getRequirement(), suguri.getNormaGoal().getRequirement());
+
+    expected = NormaFactory.getWinsNorma(3);
+    suguri.normaClear();
+    controller.setWinsNorma(suguri);
+    assertEquals(expected, suguri.getNormaGoal());
+    assertEquals(NormaFactory.getWinsNorma(3).getRequirement(), suguri.getNormaGoal().getRequirement());
+
+    assertNotEquals(NormaFactory.getWinsNorma(3), NormaFactory.getStarsNorma(3));
+    assertNotEquals(NormaFactory.getWinsNorma(3), new Object());
+
+  }
+
+  @Test
+  public void winsNormaTest() {
+    suguri.normaClear();
+    suguri.normaClear();
+    suguri.normaClear();
+    controller.setWinsNorma(suguri);
+    assertFalse(suguri.normaCheck());
+    int req = suguri.getNormaGoal().getRequirement();
+    suguri.increaseWinsBy(req);
+    assertTrue(suguri.normaCheck());
+
+
+  }
+
+
+  @Test
   public void boardCircuitTest() {
     HomePanel panel1 = controller.createHomePanel(0);
     NeutralPanel panel2 = controller.createNeutralPanel(1);
@@ -142,43 +173,176 @@ public class ControllerTest {
 
     Player testSuguri = controller.createPlayer("Suguri", 4, 1, -1, 2, panel1 );
 
-    controller.beginTurn();
-    controller.useCard();
     controller.movePlayer(1);
-    controller.finishTurn();
     IPanel expectedPanel = panel2;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.beginTurn();
-    controller.useCard();
     controller.movePlayer(1);
-    controller.finishTurn();
     expectedPanel = panel3;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.beginTurn();
-    controller.useCard();
     controller.movePlayer(1);
-    controller.finishTurn();
     expectedPanel = panel4;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.beginTurn();
-    controller.useCard();
     controller.movePlayer(1);
-    controller.finishTurn();
     expectedPanel = panel5;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
-    controller.beginTurn();
-    controller.useCard();
     controller.movePlayer(1);
-    controller.finishTurn();
 
     expectedPanel = panel1;
     assertEquals(expectedPanel, controller.getPlayerPanel(testSuguri));
 
   }
+
+  @RepeatedTest(100)
+  void stopAtHomeTest() {
+    HomePanel panel1 = controller.createHomePanel(0);
+    NeutralPanel panel2 = controller.createNeutralPanel(1);
+    DropPanel panel3 = controller.createDropPanel(2);
+    BossPanel panel4 = controller.createBossPanel(3);
+    NeutralPanel panel5 = controller.createNeutralPanel(4);
+
+    controller.setNextPanel(panel1, panel2);
+    controller.setNextPanel(panel2, panel3);
+    controller.setNextPanel(panel3, panel4);
+    controller.setNextPanel(panel4, panel5);
+    controller.setNextPanel(panel5, panel1);
+
+    Player player1 = controller.createPlayer("Suguri", 4, 1, -1, 2, panel2);
+    controller.setPlayerHome(player1, panel1);
+    controller.placePlayer(panel5);
+
+    controller.beginTurn();
+    controller.useCard();
+    int remSteps = controller.doMove();
+    if (remSteps != 0) {
+      assertEquals(player1.getCurrentPanel(), panel1);
+      assertTrue(controller.getTurnState().isHomeStopChoosePhase());
+      controller.stopAtHome();
+    }
+      assertTrue(controller.getTurnState().isEndPhase());
+      controller.finishTurn();
+      assertTrue(controller.getTurnState().isStartPhase());
+
+
+
+
+  }
+
+  @RepeatedTest(100)
+  void continueMovingTest() {
+    HomePanel panel1 = controller.createHomePanel(0);
+    NeutralPanel panel2 = controller.createNeutralPanel(1);
+    DropPanel panel3 = controller.createDropPanel(2);
+    BossPanel panel4 = controller.createBossPanel(3);
+    NeutralPanel panel5 = controller.createNeutralPanel(4);
+
+    controller.setNextPanel(panel1, panel2);
+    controller.setNextPanel(panel2, panel5);
+    controller.setNextPanel(panel1, panel3);
+    controller.setNextPanel(panel3, panel4);
+    controller.setNextPanel(panel4, panel5);
+    controller.setNextPanel(panel5, panel1);
+
+    Player player1 = controller.createPlayer("Suguri", 4, 1, -1, 2, panel2);
+    controller.setPlayerHome(player1, panel1);
+    controller.placePlayer(panel5);
+
+    controller.beginTurn();
+    controller.useCard();
+    int remSteps = controller.doMove();
+    if (remSteps != 0) {
+      assertEquals(player1.getCurrentPanel(), panel1);
+      assertTrue(controller.getTurnState().isHomeStopChoosePhase());
+      remSteps = controller.continueMovingThrough(panel3);
+    }
+    if (remSteps == 0) {
+      assertTrue(controller.getTurnState().isEndPhase());
+      controller.finishTurn();
+      assertTrue(controller.getTurnState().isStartPhase());
+    }
+
+
+
+  }
+
+  @RepeatedTest(500)
+  void recoveryTrialTest() {
+    HomePanel panel1 = controller.createHomePanel(0);
+    NeutralPanel panel2 = controller.createNeutralPanel(1);
+    DropPanel panel3 = controller.createDropPanel(2);
+    BossPanel panel4 = controller.createBossPanel(3);
+    NeutralPanel panel5 = controller.createNeutralPanel(4);
+
+    controller.setNextPanel(panel1, panel2);
+    controller.setNextPanel(panel2, panel5);
+    controller.setNextPanel(panel1, panel3);
+    controller.setNextPanel(panel3, panel4);
+    controller.setNextPanel(panel4, panel5);
+    controller.setNextPanel(panel5, panel1);
+
+    Player player1 = controller.createPlayer("Suguri", 4, 1, -1, 2, panel2);
+    Player player2 = controller.createPlayer("Suguri 2: Electric Boogaloo", 4, 1, -1, 2, panel3);
+
+    controller.setPlayerHome(player1, panel1);
+    controller.placePlayer(panel5);
+
+    while(!player1.isKOd()) {
+      player1.defendAttack(player2, 2000);
+    }
+
+    //
+    controller.beginTurn();
+    //
+    int preRec = player1.getRecoveryLeft();
+    controller.recoveryTrial();
+    int postRec = player1.getRecoveryLeft();
+    assertTrue(preRec > postRec);
+    if (postRec == 0) {
+      // Suguri did successfully complete the recovery trial so she should be able to
+      // use her turn now.
+      assertTrue(controller.getTurnState().isCardPickPhase());
+      assertEquals(player1.getCurrentHP(),player1.getMaxHP());
+    }
+  }
+
+
+  @Test
+  void placePlayerTest() {
+    HomePanel panel1 = controller.createHomePanel(0);
+    NeutralPanel panel2 = controller.createNeutralPanel(1);
+    DropPanel panel3 = controller.createDropPanel(2);
+    BossPanel panel4 = controller.createBossPanel(3);
+    NeutralPanel panel5 = controller.createNeutralPanel(4);
+
+    controller.setNextPanel(panel1, panel2);
+    controller.setNextPanel(panel2, panel3);
+    controller.setNextPanel(panel3, panel4);
+    controller.setNextPanel(panel4, panel5);
+    controller.setNextPanel(panel5, panel1);
+
+    Player player1 = controller.createPlayer("Suguri", 4, 1, -1, 2, panel1);
+    IPanel expected;
+
+    assertEquals(player1.getCurrentPanel(),panel1);
+    List<IPanel> testPanels = new ArrayList<>();
+    testPanels.add(panel1);
+    testPanels.add(panel2);
+    testPanels.add(panel3);
+    testPanels.add(panel4);
+    testPanels.add(panel5);
+
+    for (IPanel c: testPanels) {
+      expected = c;
+      controller.placePlayer(c);
+      assertTrue(expected.getPlayers().contains(player1));
+      assertEquals(player1.getCurrentPanel(), expected);
+    }
+
+  }
+
 
   @Test
   public void turnsAndChapterTest() {

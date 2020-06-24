@@ -23,6 +23,7 @@ public class Player extends AbstractUnit {
   protected IPanel currentPanel = NullPanel.getNullPanel();
   protected IPanel homePanel = NullPanel.getNullPanel();
   protected INormaGoal goal;
+  protected int recoveryLeft;
   // Observable
   private PropertyChangeSupport changes;
 
@@ -160,7 +161,6 @@ public class Player extends AbstractUnit {
     this.evd = value;
   }
 
-
   /**
    * Returns a copy of this character.
    */
@@ -168,15 +168,59 @@ public class Player extends AbstractUnit {
     return new Player(name, maxHP, atk, def, evd);
   }
 
+  /**
+   * Does a roll to diminish the recoveryLeft count.
+   * If it gets the counter on 0 will call the playerRevive method to reset its stats.
+   */
+  public int recoveryTrial() {
+    int val = roll();
+    int newCounter = getRecoveryLeft();
+    if (isKOd()) {
+      newCounter = Math.max(0, getRecoveryLeft() - val);
+      setRecoveryLeft(newCounter);
 
+      if (getRecoveryLeft() == 0) {
+        playerRevive();
+      }
+
+    }
+
+    return newCounter;
+  }
+
+  /**
+   * Sets the amount of recovery left for this player.
+   * @param value
+   *    new recovery left value
+   */
+  public void setRecoveryLeft(int value) {
+    recoveryLeft = value;
+  }
+
+  /**
+   * Returns the amount of recovery score left for this player to come back.
+   * @return
+   *    amount of recovery score left to come back
+   */
+  public int getRecoveryLeft() {
+    return recoveryLeft;
+  }
+
+  /**
+   * Restores this unit's max HP, should be called when recovery trial is completed.
+   */
+  void playerRevive() {
+    setCurrentHP(getMaxHP());
+  }
 
   @Override
-  void defeatedBy(AbstractUnit attacker) {
+  void defeatedBy(IUnit attacker) {
+    setRecoveryLeft(6);
     attacker.winAgainstPlayer(this);
   }
 
   @Override
-  void winAgainstPlayer(Player player) {
+  public void winAgainstPlayer(IUnit player) {
     this.increaseWinsBy(2);
     int getStars = Math.floorDiv(player.getStars(),2);
     this.increaseStarsBy(getStars);
@@ -184,7 +228,7 @@ public class Player extends AbstractUnit {
   }
 
   @Override
-  void winAgainstWildUnit(WildUnit wildunit) {
+  public void winAgainstWildUnit(IUnit wildunit) {
     this.increaseWinsBy(1);
     int getStars = wildunit.getStars();
     this.increaseStarsBy(getStars);
@@ -192,7 +236,7 @@ public class Player extends AbstractUnit {
   }
 
   @Override
-  void winAgainstBossUnit(BossUnit bossunit) {
+  public void winAgainstBossUnit(IUnit bossunit) {
     this.increaseWinsBy(3);
     int getStars = bossunit.getStars();
     this.increaseStarsBy(getStars);

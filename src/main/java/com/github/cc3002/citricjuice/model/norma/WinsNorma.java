@@ -4,8 +4,6 @@ import com.github.cc3002.citricjuice.model.unit.Player;
 
 public class WinsNorma extends AbstractNormaGoal {
 
-  int requirement;
-
   public WinsNorma(int wins) {
     requirement = wins;
   }

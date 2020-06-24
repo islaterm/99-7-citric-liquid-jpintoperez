@@ -10,9 +10,6 @@ public abstract class AbstractNormaGoal implements INormaGoal {
 
   public int getRequirement() {
     return requirement;
-  };
-  public void setRequirement(int value) {
-    requirement = value;
-  };
+  }
 }
 

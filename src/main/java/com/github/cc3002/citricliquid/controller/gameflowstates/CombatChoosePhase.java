@@ -1,6 +1,6 @@
-package com.github.cc3002.citricliquid.controller;
+package com.github.cc3002.citricliquid.controller.gameflowstates;
 
-import com.github.cc3002.citricjuice.model.unit.Player;
+import com.github.cc3002.citricjuice.model.unit.IUnit;
 
 public class CombatChoosePhase extends TurnPhase {
   int steps;
@@ -15,12 +15,18 @@ public class CombatChoosePhase extends TurnPhase {
   }
 
   @Override
-  void movingPhase() {
+  public void movingPhase() {
     changeTurnPhase(new MovingPhase());
   }
 
   @Override
-  void combatResponseChoosePhase(Player attacker, int attackValue, Player target) {
+  public void combatResponseChoosePhase(IUnit attacker, int attackValue, IUnit target) {
     changeTurnPhase(new CombatResponseChoosePhase(attacker, attackValue, target));
   }
+
+  @Override
+  public boolean isCombatChoosePhase() {
+    return true;
+  }
+
 }

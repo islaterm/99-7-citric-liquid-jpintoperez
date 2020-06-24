@@ -1,95 +1,210 @@
 package com.github.cc3002.citricliquid.controller;
 
-import com.github.cc3002.citricjuice.model.board.IPanel;
 import com.github.cc3002.citricjuice.model.unit.Player;
+import com.github.cc3002.citricliquid.controller.gameflowstates.TurnState;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TurnPhaseTest {
-  GameController controller = new GameController();
+  TurnState state;
   private Player suguri;
   private Player kai;
 
   @BeforeEach
-  void ControllerSetUp() {
-    List<Player> Players = new ArrayList();
-    controller = new GameController();
-    IPanel panel1 = controller.createNeutralPanel(0);
-    IPanel panel2 = controller.createNeutralPanel(1);
-    IPanel panel3 = controller.createNeutralPanel(2);
-    IPanel panel4 = controller.createNeutralPanel(3);
-    IPanel panel5 = controller.createNeutralPanel(4);
-
-    controller.setNextPanel(panel1,panel2);
-    controller.setNextPanel(panel2,panel3);
-    controller.setNextPanel(panel3,panel4);
-    controller.setNextPanel(panel4,panel5);
-    controller.setNextPanel(panel5,panel1);
-
-    suguri = controller.createPlayer("Suguri",4,1,-1, 2, panel1);
-    kai = controller.createPlayer("Kai",5,1,0, 0, panel2);
+  void phaseSetUp() {
+    state = new TurnState();
   }
 
-  @RepeatedTest(50)
-  void combatDefendTest() {
-    Random suguriRandom = new Random();
-    Random kaiRandom = new Random();
-    final long testSeed = new Random().nextLong();
-    suguriRandom.setSeed(testSeed);
-    kaiRandom.setSeed(testSeed);
-    suguri.setSeed(testSeed);
-    kai.setSeed(testSeed);
-
-    int expectedSuguriAtk = suguri.getAtk() + suguriRandom.nextInt(6) + 1;
-    int expectedKaiDef = kai.getDef() + kaiRandom.nextInt(6) + 1;
-    int prevHP = kai.getCurrentHP();
-    int expectedHP = prevHP - Math.max(1, expectedSuguriAtk - (expectedKaiDef));
-    // Suguri's Turn: Receive stars
-    controller.beginTurn();
-    controller.useCard(); // Pick no card
-    controller.movePlayer(3); // Try to move (forced 3)
-    controller.startCombat();
-    // Kai has to answer this combat request
-    controller.defendAgainstCombat();
-    assertEquals(expectedHP, kai.getCurrentHP());
-    controller.finishTurn();
+  @Test
+  void MoveWithoutCombatTest() {
+    // A valid game flow would be
+    // StartPhase -> CardPickPhase -> MovingPhase -> CombatChoosePhase -> MovingPhase -> EndPhase
+    state.cardPickPhase();
+    assertTrue(state.isCardPickPhase());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.combatChoosePhase(3);
+    assertTrue(state.isCombatChoosePhase());
+    assertEquals(3, state.getSteps());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.endPhase();
+    assertTrue(state.isEndPhase());
   }
 
-  @RepeatedTest(50)
-  void combatEvadeTest() {
-    Random suguriRandom = new Random();
-    Random kaiRandom = new Random();
-    final long testSeed = new Random().nextLong();
-    suguriRandom.setSeed(testSeed);
-    kaiRandom.setSeed(testSeed);
-    suguri.setSeed(testSeed);
-    kai.setSeed(testSeed);
+  @Test
+  void MoveWithCombatTest() {
+    // A valid game flow would be
+    // StartPhase -> CardPickPhase -> MovingPhase -> CombatChoosePhase -> CombatResponseChoosePhase -> CounterattackPhase -> CounterattackResponseChoosePhase -> EndPhase
+    Player attacker = new Player("Suguri", 4, 1, -1, 2 );
+    int attackValue = 3;
+    Player victim = new Player("Kai", 5, 1, 0, 0 );
+    assertTrue(state.isStartPhase());
+    state.cardPickPhase();
+    assertTrue(state.isCardPickPhase());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.combatChoosePhase(3);
+    assertTrue(state.isCombatChoosePhase());
+    state.combatResponseChoosePhase( attacker, attackValue, victim);
+    assertTrue(state.isCombatResponseChoosePhase());
+    assertEquals(attackValue, state.getAttackValue());
+    assertEquals(attacker, state.getAttacker());
+    assertEquals(victim, state.getTarget());
+    state.counterattackPhase(attacker);
+    assertTrue(state.isCounterattackPhase());
+    assertEquals(attacker, state.getAttacker());
+    state.counterattackResponseChoosePhase(victim,5,attacker);
+    assertTrue(state.isCounterattackResponseChoosePhase());
+    assertEquals(victim, state.getAttacker());
+    assertEquals(5, state.getAttackValue());
+    assertEquals(attacker, state.getTarget());
 
-    int expectedSuguriAtk = suguri.getAtk() + suguriRandom.nextInt(6) + 1;
-    int expectedKaiEvd = kai.getEvd() + kaiRandom.nextInt(6) + 1;
-    int prevHP = kai.getCurrentHP();
-    int expectedHP = Math.max(0,prevHP - expectedSuguriAtk);
-    if (expectedKaiEvd > expectedSuguriAtk) {
-      expectedHP = prevHP;
-    }
-
-    // Suguri's Turn: Receive stars
-    controller.beginTurn();
-    controller.useCard(); // Pick no card
-    controller.movePlayer(3); // Try to move (forced 3)
-    controller.startCombat();
-    // Kai has to answer this combat request
-    controller.evadeAgainstCombat();
-    assertEquals(expectedHP, kai.getCurrentHP());
-    controller.finishTurn();
+    state.endPhase();
+    assertTrue(state.isEndPhase());
   }
+
+  @Test
+  void MoveChoosingPathTest() {
+    // A valid game flow would be
+    // StartPhase -> CardPickPhase -> MovingPhase -> PathChoosePhase -> MovingPhase -> EndPhase
+    assertTrue(state.isStartPhase());
+    state.cardPickPhase();
+    assertTrue(state.isCardPickPhase());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.pathChoosePhase(4);
+    assertTrue(state.isPathChoosePhase());
+    assertEquals(4, state.getSteps());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.endPhase();
+    assertTrue(state.isEndPhase());
+  }
+
+  @Test
+  void StoppingAtHomeTest() {
+    // A valid game flow would be
+    // StartPhase -> CardPickPhase -> MovingPhase -> HomeStopChoosePhase -> EndPhase
+    assertTrue(state.isStartPhase());
+    state.cardPickPhase();
+    assertTrue(state.isCardPickPhase());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.homeStopChoosePhase(4);
+    assertTrue(state.isHomeStopChoosePhase());
+    assertEquals(4, state.getSteps());
+    state.endPhase();
+    assertTrue(state.isEndPhase());
+    // Game should be capable to make the turn cycle start again so we can go to StartPhase again
+    state.startPhase();
+    assertTrue(state.isStartPhase());
+  }
+
+  @Test
+  void NotStoppingAtHomeTest() {
+    // A valid game flow would be
+    // StartPhase -> CardPickPhase -> MovingPhase -> HomeStopChoosePhase -> MovingPhase -> EndPhase
+    assertTrue(state.isStartPhase());
+    state.cardPickPhase();
+    assertTrue(state.isCardPickPhase());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.homeStopChoosePhase(4);
+    assertTrue(state.isHomeStopChoosePhase());
+    assertEquals(4, state.getSteps());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.endPhase();
+    assertTrue(state.isEndPhase());
+    // Game should be capable to make the turn cycle start again so we can go to StartPhase again
+    state.startPhase();
+    assertTrue(state.isStartPhase());
+  }
+
+  @Test
+  void incorrectStateTest() {
+    // We start
+    assertTrue(state.isStartPhase());
+    state.recoveryPhase();
+    assertTrue(state.isRecoveryPhase());
+    state.endPhase();
+    // Game should be capable to make the turn cycle start again so we can go to StartPhase.
+    assertTrue(state.isEndPhase());
+    state.startPhase();
+    assertTrue(state.isStartPhase());
+  }
+
+  @Test
+  void recoveryTrialFailPhaseTest() {
+    // The state starts in startPhase
+    assertFalse(state.isEndPhase());
+    assertFalse(state.isCardPickPhase());
+    assertFalse(state.isCombatChoosePhase());
+    assertFalse(state.isCombatResponseChoosePhase());
+    assertFalse(state.isCounterattackPhase());
+    assertFalse(state.isCounterattackResponseChoosePhase());
+    assertFalse(state.isEndPhase());
+    assertFalse(state.isHomeStopChoosePhase());
+    assertFalse(state.isMovingPhase());
+    assertFalse(state.isPathChoosePhase());
+    assertFalse(state.isRecoveryPhase());
+
+    state.cardPickPhase();
+    assertFalse(state.isStartPhase());
+
+  }
+
+  @Test
+  void recoveryTrialPassPhaseTest() {
+    // A valid game flow would be
+    // StartPhase -> RecoveryPhase -> CardPickPhase -> movingPhase -> EndPhase -> StartPhase
+    assertTrue(state.isStartPhase());
+    state.recoveryPhase();
+    assertTrue(state.isRecoveryPhase());
+    state.cardPickPhase();
+    assertTrue(state.isCardPickPhase());
+    state.movingPhase();
+    assertTrue(state.isMovingPhase());
+    state.endPhase();
+    assertTrue(state.isEndPhase());
+    // Game should be capable to make the turn cycle start again so we can go to StartPhase.
+    state.startPhase();
+    assertTrue(state.isStartPhase());
+  }
+
+
+  @Test
+  void InvalidCycle() {
+    Player attacker = new Player("Suguri", 4, 1, -1, 2 );
+    int attackValue = 3;
+    Player victim = new Player("Kai", 5, 1, 0, 0 );
+    Assertions.assertThrows(AssertionError.class, () -> state.combatChoosePhase(3), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.combatResponseChoosePhase(attacker, attackValue, victim), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.counterattackPhase(victim), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.counterattackResponseChoosePhase(victim, attackValue, attacker), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.endPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.homeStopChoosePhase(3), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.movingPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.pathChoosePhase(3), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.startPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+
+    Assertions.assertThrows(AssertionError.class, () -> state.startPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+
+    state.cardPickPhase();
+    Assertions.assertThrows(AssertionError.class, () -> state.cardPickPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.getSteps(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.getAttacker(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.getAttackValue(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.getTarget(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.recoveryPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+
+  }
+
+
 
 
 }
