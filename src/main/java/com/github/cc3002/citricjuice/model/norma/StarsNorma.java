@@ -4,15 +4,9 @@ import com.github.cc3002.citricjuice.model.unit.Player;
 
 public class StarsNorma extends AbstractNormaGoal {
 
-  int requirement;
 
   public StarsNorma(int stars) {
     requirement = stars;
-  }
-
-  @Override
-  public int getRequirement() {
-    return requirement;
   }
 
   @Override
@@ -21,6 +15,11 @@ public class StarsNorma extends AbstractNormaGoal {
 
     if (stars >= requirement) {
       player.normaClear();
+      /*
+      We should ask the player which norma goal would they like to set
+      but since there's no player interaction yet we'll just assume
+      they'll pick same normaGoal, this must be changed in future implementations.
+      */
       player.setNormaGoal(NormaFactory.getStarsNorma(player.getNormaLevel()));
       return true;
     }

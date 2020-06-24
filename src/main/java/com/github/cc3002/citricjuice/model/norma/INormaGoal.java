@@ -16,9 +16,8 @@ public interface INormaGoal {
 
    */
 
-  abstract boolean normaCheck(Player player);
-  abstract int getRequirement();
-  abstract void setRequirement(int value);
+  boolean normaCheck(Player player);
+  int getRequirement();
 }
 
 /*

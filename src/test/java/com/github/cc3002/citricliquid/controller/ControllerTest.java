@@ -129,14 +129,33 @@ public class ControllerTest {
     INormaGoal expected = NormaFactory.getStarsNorma(2);
     controller.setStarsNorma(suguri);
     assertEquals(expected, suguri.getNormaGoal());
+    assertEquals(NormaFactory.getStarsNorma(2).getRequirement(), suguri.getNormaGoal().getRequirement());
 
     expected = NormaFactory.getWinsNorma(3);
     suguri.normaClear();
     controller.setWinsNorma(suguri);
     assertEquals(expected, suguri.getNormaGoal());
+    assertEquals(NormaFactory.getWinsNorma(3).getRequirement(), suguri.getNormaGoal().getRequirement());
+
+    assertNotEquals(NormaFactory.getWinsNorma(3), NormaFactory.getStarsNorma(3));
+    assertNotEquals(NormaFactory.getWinsNorma(3), new Object());
+
+  }
+
+  @Test
+  public void winsNormaTest() {
+    suguri.normaClear();
+    suguri.normaClear();
+    suguri.normaClear();
+    controller.setWinsNorma(suguri);
+    assertFalse(suguri.normaCheck());
+    int req = suguri.getNormaGoal().getRequirement();
+    suguri.increaseWinsBy(req);
+    assertTrue(suguri.normaCheck());
 
 
   }
+
 
   @Test
   public void boardCircuitTest() {
