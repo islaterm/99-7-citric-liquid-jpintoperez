@@ -11,12 +11,15 @@ public class HomeStopChoosePhase extends TurnPhase {
     return steps;
   }
   @Override
-  public void movingPhase() {
-    changeTurnPhase(new MovingPhase());
+  public void movingPhase(int steps) {
+    changeTurnPhase(new MovingPhase(steps));
   }
 
   @Override
   public void endPhase() { changeTurnPhase(new EndPhase()); }
+
+  @Override
+  public void normaPickPhase() { changeTurnPhase(new NormaPickPhase()); }
 
   @Override
   public boolean isHomeStopChoosePhase() {

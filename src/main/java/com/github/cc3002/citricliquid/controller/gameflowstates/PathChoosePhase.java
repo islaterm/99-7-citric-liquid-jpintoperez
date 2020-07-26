@@ -14,8 +14,8 @@ public class PathChoosePhase extends TurnPhase {
   }
 
   @Override
-  public void movingPhase() {
-    changeTurnPhase(new MovingPhase());
+  public void movingPhase(int steps) {
+    changeTurnPhase(new MovingPhase(steps));
   }
 
   @Override

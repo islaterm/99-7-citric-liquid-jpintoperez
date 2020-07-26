@@ -9,7 +9,8 @@ public class NeutralPanel extends AbstractPanel {
      *   Creates an instance of NeutralPanel.
      */
 
-    public NeutralPanel(int panelID) { super(panelID); }
+    public NeutralPanel(int panelID) { super(panelID);
+        setPanelDescription("This is a Neutral Panel!");}
 
     /**
      * Does literally nothing.
@@ -17,4 +18,10 @@ public class NeutralPanel extends AbstractPanel {
     public void activatedBy(final @NotNull Player player) {
         // nothing. truly nothingness.
     }
+
+    @Override
+    public String getSpriteString() {
+        return "NEUTRAL";
+    }
+
 }

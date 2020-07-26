@@ -18,6 +18,12 @@ public interface INormaGoal {
 
   boolean normaCheck(Player player);
   int getRequirement();
+
+  /**
+   * Returns the noun for this goal. (Useful for GUI descriptions and texts)
+   * @return
+   */
+  String getRequirementNoun();
 }
 
 /*

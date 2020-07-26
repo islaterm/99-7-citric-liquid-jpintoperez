@@ -7,19 +7,26 @@ public class EncounterPanel extends AbstractPanel {
 
 
     /**
-     * Should start an encounter. Not Implemented Yet.
+     * Tells the player to force an encounter by sending the forceEncounter notification.
      * @param player the player activating this panel.
      */
     public void activatedBy(final @NotNull Player player) {
+        player.forceEncounter();
     }
 
 
     /**
-     *   Creates an instance of EncounterPanel.
+     * Creates an instance of EncounterPanel.
      */
 
     public EncounterPanel(int panelID) {
-        super(panelID); }
+        super(panelID);
+        setPanelDescription("This is an Encounter Panel, land here to engage in battle with a wild enemy!");
+    }
 
+    @Override
+    public String getSpriteString() {
+        return "ENCOUNTER";
+    }
 
 }

@@ -1,7 +1,6 @@
 package com.github.cc3002.citricliquid.controller.gameflowstates;
 
 import com.github.cc3002.citricjuice.model.unit.IUnit;
-import com.github.cc3002.citricjuice.model.unit.Player;
 
 public class TurnState {
   TurnPhase phase;
@@ -18,6 +17,14 @@ public class TurnState {
   public void setTurnPhase(TurnPhase phase) {
     this.phase = phase;
     phase.setTurnState(this);
+  }
+
+  /**
+   * Returns the actual turnPhase.
+   * @return
+   */
+  public TurnPhase getTurnPhase() {
+    return phase;
   }
 
   /**
@@ -38,7 +45,7 @@ public class TurnState {
   /**
    * Transition method to moving phase
    */
-  public void movingPhase() { phase.movingPhase(); }
+  public void movingPhase(int steps) { phase.movingPhase(steps); }
   /**
    * Transition method to path choose phase
    */
@@ -50,7 +57,7 @@ public class TurnState {
   /**
    * Transition method to response choose phase
    */
-  public void combatResponseChoosePhase(Player attacker, int attackValue, Player target) { phase.combatResponseChoosePhase(attacker, attackValue, target); }
+  public void combatResponseChoosePhase(IUnit attacker, int attackValue, IUnit target) { phase.combatResponseChoosePhase(attacker, attackValue, target); }
 
   /**
    * Transition method to stop choose phase
@@ -70,7 +77,10 @@ public class TurnState {
    * Transition method to end phase
    */
   public void endPhase() { phase.endPhase(); }
-
+  /**
+   * Transition method to normaPick phase
+   */
+  public void normaPickPhase() { phase.normaPickPhase(); }
 
   /**
    * Getter method to access the attacker reference
@@ -92,6 +102,13 @@ public class TurnState {
    *    amount of pending steps.
    */
   public int getSteps() { return phase.getSteps(); }
+
+  /**
+   * Setter method to set the remaining steps
+   * @return
+   *    amount of pending steps.
+   */
+  public void setSteps(int steps) { phase.setSteps(steps); }
 
   /**
    * Getter method to access the target reference
@@ -188,5 +205,10 @@ public class TurnState {
    *    whether the state is currently on that phase.
    */
   public boolean isRecoveryPhase() { return phase.isRecoveryPhase(); }
-
+  /**
+   * Boolean method to check normaPick phase
+   * @return
+   *    whether the state is currently on that phase.
+   */
+  public boolean isNormaPickPhase() { return phase.isNormaPickPhase(); }
 }

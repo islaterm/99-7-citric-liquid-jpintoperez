@@ -5,12 +5,25 @@ import org.jetbrains.annotations.NotNull;
 
 public class BossPanel extends AbstractPanel {
 
+
+    /**
+     * Tells the player to force a bossEncounter by sending the forceBossEncounter notification.
+     * @param player the player activating this panel.
+     */
+    public void activatedBy(final @NotNull Player player) {
+        player.forceBossEncounter();
+    }
+
     /**
      *   Creates an instance of BossPanel.
      */
-    public void activatedBy(final @NotNull Player player) {
-        // not implemented yet
+    public BossPanel(int panelID) { super(panelID);
+        setPanelDescription("This is a Boss Panel, land here to face against a powerful enemy!");}
+
+
+    @Override
+    public String getSpriteString() {
+        return "BOSS";
     }
-    public BossPanel(int panelID) { super(panelID); }
 
 }

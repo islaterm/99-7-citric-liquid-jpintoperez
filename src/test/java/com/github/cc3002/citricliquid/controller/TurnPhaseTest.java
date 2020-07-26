@@ -1,6 +1,8 @@
 package com.github.cc3002.citricliquid.controller;
 
 import com.github.cc3002.citricjuice.model.unit.Player;
+import com.github.cc3002.citricliquid.controller.gameflowstates.StartPhase;
+import com.github.cc3002.citricliquid.controller.gameflowstates.TurnPhase;
 import com.github.cc3002.citricliquid.controller.gameflowstates.TurnState;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,20 +21,29 @@ public class TurnPhaseTest {
   }
 
   @Test
+  void TurnStateTest() {
+
+    TurnPhase phase = state.getTurnPhase();
+    assertTrue(phase instanceof StartPhase);
+
+  }
+
+  @Test
   void MoveWithoutCombatTest() {
     // A valid game flow would be
     // StartPhase -> CardPickPhase -> MovingPhase -> CombatChoosePhase -> MovingPhase -> EndPhase
     state.cardPickPhase();
     assertTrue(state.isCardPickPhase());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.combatChoosePhase(3);
     assertTrue(state.isCombatChoosePhase());
     assertEquals(3, state.getSteps());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.endPhase();
     assertTrue(state.isEndPhase());
+    assertFalse(state.isNormaPickPhase());
   }
 
   @Test
@@ -45,7 +56,7 @@ public class TurnPhaseTest {
     assertTrue(state.isStartPhase());
     state.cardPickPhase();
     assertTrue(state.isCardPickPhase());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.combatChoosePhase(3);
     assertTrue(state.isCombatChoosePhase());
@@ -74,12 +85,12 @@ public class TurnPhaseTest {
     assertTrue(state.isStartPhase());
     state.cardPickPhase();
     assertTrue(state.isCardPickPhase());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.pathChoosePhase(4);
     assertTrue(state.isPathChoosePhase());
     assertEquals(4, state.getSteps());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.endPhase();
     assertTrue(state.isEndPhase());
@@ -92,11 +103,16 @@ public class TurnPhaseTest {
     assertTrue(state.isStartPhase());
     state.cardPickPhase();
     assertTrue(state.isCardPickPhase());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
+    assertEquals(-1,state.getSteps());
+    state.setSteps(5);
+    assertEquals(5,state.getSteps());
     state.homeStopChoosePhase(4);
     assertTrue(state.isHomeStopChoosePhase());
     assertEquals(4, state.getSteps());
+    state.normaPickPhase();
+    assertTrue(state.isNormaPickPhase());
     state.endPhase();
     assertTrue(state.isEndPhase());
     // Game should be capable to make the turn cycle start again so we can go to StartPhase again
@@ -111,12 +127,12 @@ public class TurnPhaseTest {
     assertTrue(state.isStartPhase());
     state.cardPickPhase();
     assertTrue(state.isCardPickPhase());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.homeStopChoosePhase(4);
     assertTrue(state.isHomeStopChoosePhase());
     assertEquals(4, state.getSteps());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.endPhase();
     assertTrue(state.isEndPhase());
@@ -167,7 +183,7 @@ public class TurnPhaseTest {
     assertTrue(state.isRecoveryPhase());
     state.cardPickPhase();
     assertTrue(state.isCardPickPhase());
-    state.movingPhase();
+    state.movingPhase(-1);
     assertTrue(state.isMovingPhase());
     state.endPhase();
     assertTrue(state.isEndPhase());
@@ -188,7 +204,7 @@ public class TurnPhaseTest {
     Assertions.assertThrows(AssertionError.class, () -> state.counterattackResponseChoosePhase(victim, attackValue, attacker), "Should have thrown error by trying an illegal turn phase transition.");
     Assertions.assertThrows(AssertionError.class, () -> state.endPhase(), "Should have thrown error by trying an illegal turn phase transition.");
     Assertions.assertThrows(AssertionError.class, () -> state.homeStopChoosePhase(3), "Should have thrown error by trying an illegal turn phase transition.");
-    Assertions.assertThrows(AssertionError.class, () -> state.movingPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.movingPhase(-1), "Should have thrown error by trying an illegal turn phase transition.");
     Assertions.assertThrows(AssertionError.class, () -> state.pathChoosePhase(3), "Should have thrown error by trying an illegal turn phase transition.");
     Assertions.assertThrows(AssertionError.class, () -> state.startPhase(), "Should have thrown error by trying an illegal turn phase transition.");
 
@@ -201,6 +217,9 @@ public class TurnPhaseTest {
     Assertions.assertThrows(AssertionError.class, () -> state.getAttackValue(), "Should have thrown error by trying an illegal turn phase transition.");
     Assertions.assertThrows(AssertionError.class, () -> state.getTarget(), "Should have thrown error by trying an illegal turn phase transition.");
     Assertions.assertThrows(AssertionError.class, () -> state.recoveryPhase(), "Should have thrown error by trying an illegal turn phase transition.");
+
+    Assertions.assertThrows(AssertionError.class, () -> state.setSteps(3), "Should have thrown error by trying an illegal turn phase transition.");
+    Assertions.assertThrows(AssertionError.class, () -> state.normaPickPhase(), "Should have thrown error by trying an illegal turn phase transition.");
 
   }
 

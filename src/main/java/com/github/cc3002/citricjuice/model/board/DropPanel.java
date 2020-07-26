@@ -11,6 +11,7 @@ public class DropPanel extends AbstractPanel {
 
     public DropPanel(int panelID) {
         super(panelID);
+        setPanelDescription("This is a Drop Panel, land here to roll a dice and lose stars!");
     }
 
     /**
@@ -18,5 +19,11 @@ public class DropPanel extends AbstractPanel {
      */
     public void activatedBy(final @NotNull Player player) {
         player.reduceStarsBy(player.roll() * player.getNormaLevel());
+    }
+
+
+    @Override
+    public String getSpriteString() {
+        return "DROP";
     }
 }

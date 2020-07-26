@@ -71,8 +71,6 @@ public class GameFlowTest {
     // Suguri should receive 1 star on the beginning of the turn.
     controller.beginTurn();
     assertEquals(1,suguri.getStars());
-    // Pick no card to use so we can get to the moving phase.
-    controller.useCard();
     // Now we roll the dice and move.
     controller.doMove();
     int finalPanel = Math.min(suguriRandom.nextInt(6)+1,4);
@@ -112,8 +110,6 @@ public class GameFlowTest {
     // Suguri should receive 1 star on the beginning of the turn.
     controller.beginTurn();
     assertEquals(1,suguri.getStars());
-    // Pick no card to use so we can get to the moving phase.
-    controller.useCard();
     // Now we roll the dice and move.
     controller.doMove();
     int finalPanel = Math.min(suguriRandom.nextInt(6)+1,4);
@@ -154,8 +150,6 @@ public class GameFlowTest {
     // Suguri should receive 1 star on the beginning of the turn.
     controller.beginTurn();
     assertEquals(1,suguri.getStars());
-    // Pick no card to use so we can get to the moving phase.
-    controller.useCard();
     // Now we roll the dice and move.
     controller.doMove();
     int roll = suguriRandom.nextInt(6)+1;

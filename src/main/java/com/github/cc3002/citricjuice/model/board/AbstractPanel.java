@@ -11,6 +11,30 @@ public abstract class AbstractPanel implements IPanel {
     private final List<IPanel> nextPanels = new ArrayList<>();
     private final int panelID;
     private List<Player> players = new ArrayList<>();
+    String panelDescriptionText;
+    private int X;
+    private int Y;
+
+    public void setMatrixPos(int x, int y) {
+        X = x;
+        Y = y;
+    }
+
+    public int getX() {
+        return X;
+    }
+
+    public int getY() {
+        return Y;
+    }
+
+    public String getPanelDescription() {
+        return panelDescriptionText;
+    }
+
+    public void setPanelDescription(String text) {
+        this.panelDescriptionText = text;
+    }
 
     public void addPlayer(Player player) {
         players.add(player);
@@ -66,12 +90,6 @@ public abstract class AbstractPanel implements IPanel {
     public AbstractPanel(int panelID) {
         this.panelID = panelID;
     }
-
-
-
-
-
-
 
     @Override
     public int hashCode() {
