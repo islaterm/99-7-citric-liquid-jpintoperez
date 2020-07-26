@@ -12,6 +12,7 @@ public class HomePanel extends AbstractPanel {
      */
     public HomePanel(int panelID) {
         super(panelID);
+        setPanelDescription("This is a Home Panel, land here to perform a Norma Check and get heal!");
     }
 
     /**
@@ -20,5 +21,10 @@ public class HomePanel extends AbstractPanel {
     public void activatedBy(final @NotNull Player player) {
         player.setCurrentHP(player.getCurrentHP() + 1);
         player.normaCheck();
+    }
+
+    @Override
+    public String getSpriteString() {
+        return "HOME";
     }
 }

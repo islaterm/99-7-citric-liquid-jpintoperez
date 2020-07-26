@@ -4,7 +4,6 @@ import com.github.cc3002.citricjuice.model.unit.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
 
 public interface IPanel {
     /**
@@ -13,8 +12,15 @@ public interface IPanel {
     List<IPanel> getNextPanels();
 
     List<Player> getPlayers();
+
     void removePlayer(Player player);
+
     void addPlayer(Player player);
+
+    void setMatrixPos(int x, int y);
+
+    int getX();
+    int getY();
 
     /**
      * Should add a new adjacent panel to the panel.
@@ -32,6 +38,21 @@ public interface IPanel {
      * Should perform the action of each Panel
      */
     void activatedBy(final @NotNull Player player);
+
+    /**
+     * Returns the string of the panel sprite (for GUI identification).
+     */
+    String getSpriteString();
+
+    /**
+     * Returns a help string that describes the panel.
+     */
+    String getPanelDescription();
+
+    /**
+     * Returns a help string that describes the panel.
+     */
+    void setPanelDescription(String text);
 
 
 

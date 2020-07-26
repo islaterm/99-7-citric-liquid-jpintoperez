@@ -44,6 +44,19 @@ public class NullPanel implements IPanel {
     }
 
     @Override
+    public void setMatrixPos(int x, int y) { }
+
+    @Override
+    public int getX() {
+        return 0;
+    }
+
+    @Override
+    public int getY() {
+        return 0;
+    }
+
+    @Override
     public void addNextPanel(IPanel panel) {
         System.out.println("[Warning] NullPanel shouldn't be trying to add next panels.");
         return;
@@ -59,5 +72,19 @@ public class NullPanel implements IPanel {
      */
     public void activatedBy(final @NotNull Player player) {
         return;
+    }
+
+    @Override
+    public String getSpriteString() {
+        return null;
+    }
+
+    @Override
+    public String getPanelDescription() {
+        return "";
+    }
+
+    @Override
+    public void setPanelDescription(String text) {
     }
 }

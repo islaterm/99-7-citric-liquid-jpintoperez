@@ -14,15 +14,15 @@ public class WinsNorma extends AbstractNormaGoal {
 
     if (wins >= requirement) {
       player.normaClear();
-      /*
-      We should ask the player which norma goal would they like to set
-      but since there's no player interaction yet we'll just assume
-      they'll pick same normaGoal, this must be changed in future implementations.
-       */
-      player.setNormaGoal(NormaFactory.getWinsNorma(player.getNormaLevel()));
+      // player.setNormaGoal(NormaFactory.getWinsNorma(player.getNormaLevel()));
       return true;
     }
     return false;
+  }
+
+  @Override
+  public String getRequirementNoun() {
+    return "wins";
   }
 
   @Override

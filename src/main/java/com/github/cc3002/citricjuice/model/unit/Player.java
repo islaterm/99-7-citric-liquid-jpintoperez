@@ -53,10 +53,10 @@ public class Player extends AbstractUnit {
   public Player(final String name, final int hp, final int atk, final int def,
                 final int evd) {
     super(name, hp, atk, def, evd);
-    normaLevel = 1;
-    setNormaGoal(NormaFactory.getStarsNorma(1));
     // Initializes the observable structure
     changes = new PropertyChangeSupport(this);
+    normaLevel = 1;
+    setNormaGoal(NormaFactory.getStarsNorma(1));
   }
 
 
@@ -67,7 +67,9 @@ public class Player extends AbstractUnit {
   public INormaGoal getNormaGoal() { return goal; }
 
   public void setNormaGoal(INormaGoal goal) {
+    INormaGoal preGoal = this.goal;
     this.goal = goal;
+    changes.firePropertyChange(new PropertyChangeEvent(this, "normaGoal",preGoal,this.goal));
   }
 
   public boolean normaCheck() {
@@ -77,9 +79,31 @@ public class Player extends AbstractUnit {
    * Set this unit on a certain panel.
    */
   public void setCurrentPanel(IPanel panel) {
+    IPanel prePanel = currentPanel;
+
     currentPanel.removePlayer(this);
     this.currentPanel = panel;
     currentPanel.addPlayer(this);
+
+    // When assigned to a panel has to check for different cases to
+    // notify the observers if something happens
+
+    // Stumbles upon players and might want to fight
+    if (panel.getPlayers().size() > 1) {
+      changes.firePropertyChange(new PropertyChangeEvent(this, "stumbledUponPlayer",prePanel,panel));
+    }
+
+    // Reaches its house
+    if (panel.equals(this.getHomePanel())) {
+      changes.firePropertyChange(new PropertyChangeEvent(this, "reachedHome",prePanel,panel));
+    }
+
+    // Reaches a panel with more than one next panel
+    if (panel.getNextPanels().size() > 1) {
+      changes.firePropertyChange(new PropertyChangeEvent(this, "reachedPathFork",prePanel,panel));
+    }
+
+    changes.firePropertyChange(new PropertyChangeEvent(this, "currentPanel",prePanel,panel));
   }
 
   /**
@@ -107,12 +131,21 @@ public class Player extends AbstractUnit {
   }
 
   /**
+   * Sets a certain norma level
+   */
+  public void setNormaLevel(int level) {
+    normaLevel = level;
+  }
+
+  /**
    * Performs a norma clear action; the {@code norma} counter increases in 1.
    */
   public void normaClear() {
     normaLevel++;
     changes.firePropertyChange(new PropertyChangeEvent(this, "normaLevel", this.normaLevel-1, this.normaLevel));
   }
+
+
 
   /***
    * Checks whether this player unit is equivalent to another object.
@@ -225,6 +258,8 @@ public class Player extends AbstractUnit {
     int getStars = Math.floorDiv(player.getStars(),2);
     this.increaseStarsBy(getStars);
     player.reduceStarsBy(getStars);
+    changes.firePropertyChange(new PropertyChangeEvent(this, "wins",this.getWins()-2,this.getWins()));
+    changes.firePropertyChange(new PropertyChangeEvent(this, "stars",this.getStars()-getStars,this.getStars()));
   }
 
   @Override
@@ -233,6 +268,8 @@ public class Player extends AbstractUnit {
     int getStars = wildunit.getStars();
     this.increaseStarsBy(getStars);
     wildunit.reduceStarsBy(getStars);
+    changes.firePropertyChange(new PropertyChangeEvent(this, "wins",this.getWins()-1,this.getWins()));
+    changes.firePropertyChange(new PropertyChangeEvent(this, "stars",this.getStars()-getStars,this.getStars()));
   }
 
   @Override
@@ -241,5 +278,27 @@ public class Player extends AbstractUnit {
     int getStars = bossunit.getStars();
     this.increaseStarsBy(getStars);
     bossunit.reduceStarsBy(getStars);
+    changes.firePropertyChange(new PropertyChangeEvent(this, "wins",this.getWins()-3,this.getWins()));
+    changes.firePropertyChange(new PropertyChangeEvent(this, "stars",this.getStars()-getStars,this.getStars()));
   }
+
+  /**
+   * Override of setCurrentHP that also adds Property Change notification
+   * @param newHP
+   */
+  @Override
+  public void setCurrentHP(int newHP) {
+    int preHP = getCurrentHP();
+    super.setCurrentHP(newHP);
+    changes.firePropertyChange(new PropertyChangeEvent(this, "HP",preHP,this.getCurrentHP()));
+  }
+
+  public void forceEncounter() {
+    changes.firePropertyChange(new PropertyChangeEvent(this, "landedOnEncounter",null, null));
+  }
+
+  public void forceBossEncounter() {
+    changes.firePropertyChange(new PropertyChangeEvent(this, "landedOnBossEncounter",null, null));
+  }
+
 }

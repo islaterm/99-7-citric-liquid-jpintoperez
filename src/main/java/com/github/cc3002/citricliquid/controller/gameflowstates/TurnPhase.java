@@ -48,7 +48,7 @@ public class TurnPhase {
   /**
    * Transition to moving phase.
    */
-  public void movingPhase() { error(); }
+  public void movingPhase(int steps) { error(); }
 
   /**
    * Transition to path choose phase, it must store the remaining steps.
@@ -56,6 +56,11 @@ public class TurnPhase {
    *  pending steps
    */
   public void pathChoosePhase(int steps) { error(); }
+
+  /**
+   * Transition to norma pick phase.
+   */
+  public void normaPickPhase() { error(); }
 
   /**
    * Transition to combat choose phase, it must store the remaining steps.
@@ -128,6 +133,13 @@ public class TurnPhase {
    *  remaining steps
    */
   public int getSteps() { error(); return 0; }
+
+  /**
+   * Setter method to set the steps remaining from the movement.
+   * @return
+   *  remaining steps
+   */
+  public void setSteps(int steps) { error(); }
 
   /**
    * Getter method to get the target reference.
@@ -226,4 +238,11 @@ public class TurnPhase {
    *  whether it is the current phase or not
    */
   public boolean isRecoveryPhase() { return false; }
+
+  /**
+   * Boolean method to check NormaPick phase.
+   * @return
+   *  whether it is the current phase or not
+   */
+  public boolean isNormaPickPhase() { return false; }
 }

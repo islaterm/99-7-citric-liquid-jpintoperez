@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,6 +55,7 @@ class PanelTest {
     assertEquals(new HomePanel(4), testHomePanel);
     assertEquals(new NeutralPanel(5), testNeutralPanel);
 
+    assertNotEquals(testBonusPanel.hashCode(), testDropPanel.hashCode());
     assertNotEquals(testBonusPanel, new Object());
     assertNotEquals(testNeutralPanel, new Player("Peat", 3, 1, 1, 1));
   }
@@ -82,6 +82,14 @@ class PanelTest {
     assertEquals(expectedPlayers, panel1.getPlayers());
 
     assertEquals(panel1.getPanelID(), -1);
+
+    panel1.setPanelDescription("Haha funny!!!");
+    assertEquals("", panel1.getPanelDescription());
+
+    // Nothing should happen to suguri
+    Player backup = suguri.copy();
+    panel1.activatedBy(suguri);
+    assertEquals(backup, suguri);
 
 
   }
@@ -140,9 +148,7 @@ class PanelTest {
   }
 
   @Test
-  public void unimplementedPanelTests() {
-
-    // this one verifies that the unimplemented panels also do not affect the player
+  public void controllerDependantPanelTests() {
     final var expectedSuguri = suguri.copy();
     testBossPanel.activatedBy(suguri);
     assertEquals(expectedSuguri, suguri);
@@ -184,4 +190,60 @@ class PanelTest {
     }
   }
   // endregion
+
+  @Test
+  public void matrixPosTest() {
+    List<IPanel> list = List.of(new NeutralPanel(0), new BonusPanel(1), new BossPanel(2), new DropPanel(3), new EncounterPanel(4), new HomePanel(5), new NeutralPanel(6));
+    IPanel nullPanel = NullPanel.getNullPanel();
+
+    int counter = 0;
+    // Place them diagonally and then check they're effectively set on diagonal panels.
+    for (IPanel panel : list) {
+      panel.setMatrixPos(counter,counter);
+      counter+=1;
+    }
+
+    // Check again if they're on the expected positions
+    counter = 0;
+    for (IPanel panel : list) {
+      assertEquals(counter,panel.getX());
+      assertEquals(counter,panel.getY());
+      counter++;
+    }
+
+    // Check also for the nullPanel, it should return (0,0)
+    // regardless of the matrixPos we can assign to it.
+    nullPanel.setMatrixPos(69,420);
+    assertEquals(0,nullPanel.getX());
+    assertEquals(0,nullPanel.getY());
+
+
+  }
+
+  @Test
+  public void getSpritePathTest() {
+
+    IPanel panel = new NeutralPanel(0);
+    assertEquals("NEUTRAL",panel.getSpriteString());
+
+    panel = new BonusPanel(0);
+    assertEquals("BONUS",panel.getSpriteString());
+
+    panel = new BossPanel(0);
+    assertEquals("BOSS",panel.getSpriteString());
+
+    panel = new DropPanel(0);
+    assertEquals("DROP",panel.getSpriteString());
+
+    panel = new EncounterPanel(0);
+    assertEquals("ENCOUNTER",panel.getSpriteString());
+
+    panel = new HomePanel(0);
+    assertEquals("HOME",panel.getSpriteString());
+
+    panel = NullPanel.getNullPanel();
+    assertNull(panel.getSpriteString());
+
+  }
+
 }

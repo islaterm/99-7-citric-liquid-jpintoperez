@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class BonusPanel extends AbstractPanel {
 
+
     /**
      * Creates a new panel
      *
@@ -12,6 +13,7 @@ public class BonusPanel extends AbstractPanel {
      */
     public BonusPanel(int panelID) {
         super(panelID);
+        setPanelDescription("This is a Bonus Panel, land here to roll a dice and get stars!");
     }
 
     /**
@@ -20,6 +22,11 @@ public class BonusPanel extends AbstractPanel {
      */
     public void activatedBy(final @NotNull Player player) {
         player.increaseStarsBy(player.roll() * Math.min(player.getNormaLevel(), 3));
+    }
+
+    @Override
+    public String getSpriteString() {
+        return "BONUS";
     }
 
 }
